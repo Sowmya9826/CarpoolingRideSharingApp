@@ -3,7 +3,8 @@ package com.carpoolapp.carpoolService.dto;
 import lombok.Data;
 
 @Data
-public class AvailableRideInfo {
-    private String tripId;
+public class SignUpResponseDTO {
     private String userId;
+    private String username;
+    private boolean signUpSuccess;
 }
