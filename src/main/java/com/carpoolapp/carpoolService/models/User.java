@@ -1,21 +1,20 @@
 package com.carpoolapp.carpoolService.models;
 
+import jakarta.persistence.Id;
 import lombok.Data;
 import java.util.Date;
 import java.util.List;
 @Data
 
 public class User {
-    private String userId;
-    private String fullName;
+    @Id
+    private String id;
+    private String firstName;
+    private String lastName;
     private String emailId;
     private String phoneNumber;
     private String password;
     private int age;
     private Date dob;
-    private String empId;
     private String profilePicUrl;
-    private List<Vehicles> userCars;
-    private Date createdDate = new Date();
-    private String createdBy = emailId;
 }

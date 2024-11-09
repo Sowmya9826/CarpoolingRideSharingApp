@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.Getter;
 
 @Data
-public class Points {
+public class Point {
     private double latitude;
     private double longitude;
     private String placeId = "";
