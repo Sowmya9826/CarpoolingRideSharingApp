@@ -1,6 +1,6 @@
 package com.carpoolapp.carpoolService.dto;
 
-import com.carpoolapp.carpoolService.models.Points;
+import com.carpoolapp.carpoolService.models.Point;
 import lombok.Data;
 
 import java.util.Date;
@@ -9,8 +9,8 @@ public class RideBasicInfoDTO {
     //for My trips listing page
     private String userId;
     private String tripId;
-    private Points pickupPoint;
-    private Points destinationPoint;
+    private Point pickupPoint;
+    private Point destinationPoint;
     private Date rideStartTime;
     private String seats;
     private String tripStatus;

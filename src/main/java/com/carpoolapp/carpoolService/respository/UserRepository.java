@@ -1,4 +1,11 @@
 package com.carpoolapp.carpoolService.respository;
 
-public class UserRepository {
+import com.carpoolapp.carpoolService.models.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface UserRepository extends JpaRepository<User, String> {
+    // No additional methods needed; findById is provided by JpaRepository
 }
+
