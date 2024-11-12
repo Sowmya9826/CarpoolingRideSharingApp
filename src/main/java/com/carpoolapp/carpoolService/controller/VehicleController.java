@@ -1,5 +1,5 @@
 package com.carpoolapp.carpoolService.controller;
 
-public class VechileController {
+public class VehicleController {
 
 }

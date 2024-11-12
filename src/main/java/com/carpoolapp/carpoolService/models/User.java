@@ -1,11 +1,12 @@
 package com.carpoolapp.carpoolService.models;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.Data;
 import java.util.Date;
-import java.util.List;
-@Data
 
+@Entity
+@Data
 public class User {
     @Id
     private String id;
@@ -16,5 +17,5 @@ public class User {
     private String password;
     private int age;
     private Date dob;
-    private String profilePicUrl;
+    private byte[] profileImage;
 }

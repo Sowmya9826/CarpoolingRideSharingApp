@@ -1,4 +1,4 @@
 package com.carpoolapp.carpoolService.controller;
 
-public class FindRide {
+public class RideController {
 }

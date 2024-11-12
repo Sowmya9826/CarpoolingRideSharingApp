@@ -1,14 +1,15 @@
 package com.carpoolapp.carpoolService.controller;
 
-import com.carpoolapp.carpoolService.dto.UserInfoDTO;
+import com.carpoolapp.carpoolService.dto.UserDto;
 import com.carpoolapp.carpoolService.models.User;
 import com.carpoolapp.carpoolService.respository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Optional;
 
 @RestController
@@ -19,13 +20,27 @@ public class UserController {
     private UserRepository userRepository;
 
     @GetMapping("/{id}")
-    public UserInfoDTO getUserById(@PathVariable String id) {
+    public ResponseEntity<UserDto> getUserById(@PathVariable String id) {
         Optional<User> user = userRepository.findById(id);
-        UserInfoDTO userInfo = new UserInfoDTO();
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } else {
+            UserDto userDto = new UserDto();
+            userDto.setFirstName(user.get().getFirstName());
 
-
-
-
-        return userInfo;
+            return ResponseEntity.ok(userDto);
+        }
     }
+
+   /* @PostMapping("/{create}")
+    public ResponseEntity<String> createUser(@ModelAttribute UserDto userDto,
+                                             @RequestParam("file") MultipartFile file) {
+        try {
+            userService.saveUser(userDto, file);
+            return ResponseEntity.status(HttpStatus.OK).body("User created successfully");
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to save user data");
+        }
+    }*/
+
 }

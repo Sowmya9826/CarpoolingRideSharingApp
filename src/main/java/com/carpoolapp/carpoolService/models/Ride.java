@@ -18,12 +18,16 @@ public class Ride {
     @JoinColumn(name = "vehicleId", foreignKey = @ForeignKey(name = "fk_ride_vehicle"))
     private Vehicle vehicle;
 
-    private Point pickupPoint;
+    @ManyToOne
+    @JoinColumn(name = "pickupLocationId")
+    private Location pickupLocation;
 
     @Enumerated(EnumType.STRING)
     private RideStatus status;
 
-    private Point destinationPoint;
+    @ManyToOne
+    @JoinColumn(name = "destinationLocationId")
+    private Location destinationLocation;
     private Date startTime;
     private Date endTime;
     private int availableSeats;

@@ -4,6 +4,7 @@ import com.carpoolapp.carpoolService.models.enums.FareStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 
+@Entity
 @Data
 public class Fare {
     @Id
