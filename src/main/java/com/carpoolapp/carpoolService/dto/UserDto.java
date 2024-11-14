@@ -6,7 +6,7 @@ import java.util.Date;
 @Data
 public class UserDto {
     private String firstName;
-//    private String lastName;
+    private String lastName;
 //    private String emailId;
 //    private String phoneNumber;
 //    private String profilePicUrl;

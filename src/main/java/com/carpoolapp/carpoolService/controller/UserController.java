@@ -27,20 +27,17 @@ public class UserController {
         } else {
             UserDto userDto = new UserDto();
             userDto.setFirstName(user.get().getFirstName());
+//            userDto.setLastName(user.get().getLastName());
 
             return ResponseEntity.ok(userDto);
         }
     }
 
-   /* @PostMapping("/{create}")
-    public ResponseEntity<String> createUser(@ModelAttribute UserDto userDto,
-                                             @RequestParam("file") MultipartFile file) {
-        try {
-            userService.saveUser(userDto, file);
-            return ResponseEntity.status(HttpStatus.OK).body("User created successfully");
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to save user data");
-        }
-    }*/
+//    @PostMapping("/{create}")
+//    public ResponseEntity<String> createUser(@ModelAttribute UserDto userDto) {
+//        User user = new User();
+//        user.setFirstName(userDto.getFirstName());
+//        user.setLastName(userDto.getLastName());
+//    }
 
 }
