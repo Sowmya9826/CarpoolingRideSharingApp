@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Optional;
 
 @RestController
@@ -33,11 +34,22 @@ public class UserController {
         }
     }
 
-//    @PostMapping("/{create}")
-//    public ResponseEntity<String> createUser(@ModelAttribute UserDto userDto) {
-//        User user = new User();
-//        user.setFirstName(userDto.getFirstName());
-//        user.setLastName(userDto.getLastName());
-//    }
+    @PostMapping("/create")
+    public ResponseEntity<String> createUser(@ModelAttribute UserDto userDto) {
+        User user = new User();
+        user.setFirstName(userDto.getFirstName());
+        user.setLastName(userDto.getLastName());
+        user.setEmailId("email1");
+        user.setPhoneNumber("1234567890");
+        user.setAge(13);
+        Date date =new Date();
+        user.setDob(date);
+        user.setPassword("1234");
+        byte[] sampleData = { 1, 2, 3, 4, 5 };
+        user.setProfileImage(sampleData);
+
+        userRepository.save(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body("User created successfully");
+    }
 
 }

@@ -8,7 +8,8 @@ import lombok.Data;
 @Data
 public class Fare {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     @OneToOne
     @JoinColumn(name = "rideId", foreignKey = @ForeignKey(name = "fk_ride_fare"))
     private Ride ride;

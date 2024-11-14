@@ -10,7 +10,7 @@ public class UserDto {
 //    private String emailId;
 //    private String phoneNumber;
 //    private String profilePicUrl;
-//    private String userId;
+//    private Long userId;
 //    private int age;
 //    private Date dob;
 }
