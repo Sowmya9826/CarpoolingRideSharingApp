@@ -19,6 +19,37 @@ public class RideParticipant {
     private User participant;
     private RideParticipateRole role;
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public Ride getRide() {
+        return ride;
+    }
+
+    public void setRide(Ride ride) {
+        this.ride = ride;
+    }
+
+    public User getParticipant() {
+        return participant;
+    }
+
+    public void setParticipant(User participant) {
+        this.participant = participant;
+    }
+
+    public RideParticipateRole getRole() {
+        return role;
+    }
+
+    public void setRole(RideParticipateRole role) {
+        this.role = role;
+    }
 }
 
 

@@ -14,4 +14,36 @@ public class Fare {
     private Ride ride;
     private double amount;
     private FareStatus status;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public Ride getRide() {
+        return ride;
+    }
+
+    public void setRide(Ride ride) {
+        this.ride = ride;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(double amount) {
+        this.amount = amount;
+    }
+
+    public FareStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(FareStatus status) {
+        this.status = status;
+    }
 }
