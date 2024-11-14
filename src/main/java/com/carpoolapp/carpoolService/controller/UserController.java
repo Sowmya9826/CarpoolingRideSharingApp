@@ -28,14 +28,14 @@ public class UserController {
         } else {
             UserDto userDto = new UserDto();
             userDto.setFirstName(user.get().getFirstName());
-//            userDto.setLastName(user.get().getLastName());
+           userDto.setLastName(user.get().getLastName());
 
             return ResponseEntity.ok(userDto);
         }
     }
 
     @PostMapping("/create")
-    public ResponseEntity<String> createUser(@ModelAttribute UserDto userDto) {
+    public ResponseEntity<String> createUser(@RequestBody UserDto userDto) {
         User user = new User();
         user.setFirstName(userDto.getFirstName());
         user.setLastName(userDto.getLastName());
