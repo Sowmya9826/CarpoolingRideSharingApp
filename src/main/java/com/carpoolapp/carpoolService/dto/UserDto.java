@@ -7,10 +7,10 @@ import java.util.Date;
 public class UserDto {
     private String firstName;
     private String lastName;
-//    private String emailId;
-//    private String phoneNumber;
-//    private String profilePicUrl;
-//    private Long userId;
-//    private int age;
-//    private Date dob;
+    private String emailId;
+    private String phoneNumber;
+    private String password;
+    //private String ProfileImage;
+    private int age;
+    private Date dob;
 }
