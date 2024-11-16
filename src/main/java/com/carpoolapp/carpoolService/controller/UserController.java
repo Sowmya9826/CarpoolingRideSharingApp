@@ -3,24 +3,72 @@ package com.carpoolapp.carpoolService.controller;
 import com.carpoolapp.carpoolService.dto.UserDto;
 import com.carpoolapp.carpoolService.models.User;
 import com.carpoolapp.carpoolService.respository.UserRepository;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.Optional;
 
-@RestController
+@Controller
 @RequestMapping("/users")
 public class UserController {
 
     @Autowired
     private UserRepository userRepository;
 
+
+    @GetMapping("/")
+    public String index() {
+        return "sign_up_form"; // Renders templates/index.html
+    }
+
+    @GetMapping("/login")
+    public String showLoginPage() {
+        return "login";
+    }
+
+    @PostMapping("/login")
+    public String login(@RequestParam String emailId, @RequestParam String password, HttpSession session) {
+        User user = userRepository.findByEmailId(emailId)
+                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+
+        if (user.getPassword().equals(password)) {
+            // Initialize session
+            session.setAttribute("userId", user.getId());
+            session.setAttribute("userName", user.getFirstName());
+            return "redirect:/users/home";
+        }
+
+        return "redirect:/users/login?error=true";
+    }
+
+    @GetMapping("/home")
+    public String userHome(HttpSession session, Model model) {
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/users/login"; // Redirect to login if not logged in
+        }
+
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+
+        model.addAttribute("user", user);
+        return "user-home"; // Render user's home page
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate(); // Clear the session
+        return "redirect:/users/login";
+    }
+
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getUserById(@PathVariable String id) {
+    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
         Optional<User> user = userRepository.findById(id);
         if (user.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -54,11 +102,12 @@ public class UserController {
         //user.setProfileImage(sampleData);
 
         userRepository.save(user);
+
         return ResponseEntity.status(HttpStatus.CREATED).body("User created successfully");
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<String> updateUser(@PathVariable String id, @RequestBody UserDto userDto) {
+    public ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
         Optional<User> userOptional = userRepository.findById(id);
         if (userOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
@@ -81,7 +130,7 @@ public class UserController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable String id) {
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         Optional<User> userOptional = userRepository.findById(id);
         if (userOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
