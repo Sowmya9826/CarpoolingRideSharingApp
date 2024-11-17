@@ -77,3 +77,25 @@ button:hover {
 .navbar-pastel .btn:hover {
     color: #8a2be2; /* Slightly lighter white for hover effect */
 }
+
+.btn-primary {
+    background-color: #9966cc !important; /* Amethyst */
+    border-color: #9966cc !important; /* Amethyst border */
+}
+
+.btn-primary:hover {
+    background-color: #7a4db7 !important; /* Darker Amethyst for hover */
+    border-color: #7a4db7 !important;
+}
+
+/* Override btn-outline-primary */
+.btn-outline-primary {
+    color: #9966cc !important; /* Amethyst text */
+    border-color: #9966cc !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: #9966cc !important; /* Amethyst background on hover */
+    color: white !important;
+    border-color: #9966cc !important;
+}
