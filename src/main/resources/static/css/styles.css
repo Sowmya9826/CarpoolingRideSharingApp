@@ -37,7 +37,7 @@ a:hover {
 
 /* Center Content */
 .container {
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
     background: white;
     padding: 20px;
@@ -98,4 +98,9 @@ button:hover {
     background-color: #9966cc !important; /* Amethyst background on hover */
     color: white !important;
     border-color: #9966cc !important;
+}
+
+.action-button {
+  width: 150px; /* Set your desired width */
+  margin: 5px;  /* Add consistent spacing */
 }

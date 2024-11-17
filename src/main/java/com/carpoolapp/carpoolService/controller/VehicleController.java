@@ -1,42 +1,51 @@
-
-
-
-/*. vehicles/create --post
-    vehicles/user/{userId} -- get
-    vehicles/update/{id} --put
-    vehicles/delete/{id} --delete
-*
-*  */
-
 package com.carpoolapp.carpoolService.controller;
 
 import com.carpoolapp.carpoolService.dto.VehicleDto;
+import com.carpoolapp.carpoolService.models.User;
 import com.carpoolapp.carpoolService.models.Vehicle;
+import com.carpoolapp.carpoolService.respository.UserRepository;
 import com.carpoolapp.carpoolService.respository.VehicleRepository;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-@RestController
+@Controller
 @RequestMapping("/vehicles")
 public class VehicleController {
 
     @Autowired
     private VehicleRepository vehicleRepository;
 
-    /**
-     * Create a new vehicle
-     * POST: /vehicles/create
-     */
+    @Autowired
+    private UserRepository userRepository;
+
+
+    @GetMapping("/create")
+    public String createVehicle(HttpSession session, Model model) {
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/auth/login";
+        }
+
+        model.addAttribute("userId", userId);
+
+        return "vehicle_pages/new_vehicle_form";
+    }
+
     @PostMapping("/create")
-    public ResponseEntity<String> createVehicle(@RequestBody VehicleDto vehicleDto) {
+    public String createVehicle(VehicleDto vehicleDto, RedirectAttributes redirectAttributes) {
         Vehicle vehicle = new Vehicle();
-        vehicle.setOwner(vehicleDto.getOwner());
+
+        User owner = userRepository.findById(vehicleDto.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        vehicle.setOwner(owner);
         vehicle.setNumber(vehicleDto.getNumber());
         vehicle.setType(vehicleDto.getType());
         vehicle.setName(vehicleDto.getName());
@@ -44,72 +53,26 @@ public class VehicleController {
         vehicle.setSeatCount(vehicleDto.getSeatCount());
 
         vehicleRepository.save(vehicle);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Vehicle created successfully");
+        redirectAttributes.addFlashAttribute("message", "Vehicle added successfully!");
+
+        return "redirect:/vehicles/";
     }
 
-    /**
-     * Get all vehicles for a specific user
-     * GET: /vehicles/user/{userId}
-     */
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<VehicleDto>> getVehiclesByUser(@PathVariable Long userId) {
+
+    @GetMapping("/")
+    public String showVehicles(HttpSession session, Model model) {
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/auth/login";
+        }
+
         List<Vehicle> vehicles = vehicleRepository.findAll().stream()
                 .filter(vehicle -> vehicle.getOwner() != null && vehicle.getOwner().getId().equals(userId))
                 .collect(Collectors.toList());
 
-        if (vehicles.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
+        model.addAttribute("vehicles", vehicles);
 
-        List<VehicleDto> vehicleDtos = vehicles.stream().map(vehicle -> {
-            VehicleDto vehicleDto = new VehicleDto();
-            vehicleDto.setOwner(vehicle.getOwner());
-            vehicleDto.setNumber(vehicle.getNumber());
-            vehicleDto.setType(vehicle.getType());
-            vehicleDto.setName(vehicle.getName());
-            vehicleDto.setColor(vehicle.getColor());
-            vehicleDto.setSeatCount(vehicle.getSeatCount());
-            return vehicleDto;
-        }).collect(Collectors.toList());
-
-        return ResponseEntity.ok(vehicleDtos);
+        return "vehicle_pages/index";
     }
 
-    /**
-     * Update an existing vehicle
-     * PUT: /vehicles/update/{id}
-     */
-    @PutMapping("/update/{id}")
-    public ResponseEntity<String> updateVehicle(@PathVariable Long id, @RequestBody VehicleDto vehicleDto) {
-        Optional<Vehicle> vehicleOptional = vehicleRepository.findById(id);
-        if (vehicleOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Vehicle not found");
-        }
-
-        Vehicle vehicle = vehicleOptional.get();
-        vehicle.setOwner(vehicleDto.getOwner());
-        vehicle.setNumber(vehicleDto.getNumber());
-        vehicle.setType(vehicleDto.getType());
-        vehicle.setName(vehicleDto.getName());
-        vehicle.setColor(vehicleDto.getColor());
-        vehicle.setSeatCount(vehicleDto.getSeatCount());
-
-        vehicleRepository.save(vehicle);
-        return ResponseEntity.ok("Vehicle updated successfully");
-    }
-
-    /**
-     * Delete a vehicle by ID
-     * DELETE: /vehicles/delete/{id}
-     */
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteVehicle(@PathVariable Long id) {
-        Optional<Vehicle> vehicleOptional = vehicleRepository.findById(id);
-        if (vehicleOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Vehicle not found");
-        }
-
-        vehicleRepository.delete(vehicleOptional.get());
-        return ResponseEntity.ok("Vehicle deleted successfully");
-    }
 }

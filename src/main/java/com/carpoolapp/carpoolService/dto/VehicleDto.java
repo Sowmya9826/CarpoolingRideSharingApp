@@ -9,7 +9,7 @@ import lombok.Data;
 public class VehicleDto {
 
 
-    private User owner;
+    private Long userId;
     private String number;
     private String type;
     private String name;
