@@ -1,7 +1,6 @@
 package com.carpoolapp.carpoolService.dto;
 
 import lombok.Data;
-import java.util.Date;
 
 @Data
 public class UserDto {
@@ -12,5 +11,5 @@ public class UserDto {
     private String password;
     //private String ProfileImage;
     private int age;
-    private Date dob;
+    private String dob;
 }

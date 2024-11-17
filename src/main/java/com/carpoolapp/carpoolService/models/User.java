@@ -1,9 +1,6 @@
 package com.carpoolapp.carpoolService.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 import java.util.Date;
 
@@ -13,6 +10,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String firstName;
     private String lastName;
     private String emailId;
@@ -20,5 +18,7 @@ public class User {
     private String password;
     private int age;
     private Date dob;
+
+    @Lob
     private byte[] profileImage;
 }

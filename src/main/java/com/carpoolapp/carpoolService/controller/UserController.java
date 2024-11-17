@@ -3,6 +3,7 @@ package com.carpoolapp.carpoolService.controller;
 import com.carpoolapp.carpoolService.dto.UserDto;
 import com.carpoolapp.carpoolService.models.User;
 import com.carpoolapp.carpoolService.respository.UserRepository;
+import com.carpoolapp.carpoolService.service.UserRegistrationService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Date;
 import java.util.Optional;
@@ -22,10 +24,13 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserRegistrationService userRegistrationService;
+
 
     @GetMapping("/")
     public String index() {
-        return "sign_up_form"; // Renders templates/index.html
+        return "sign_up_form";
     }
 
     @GetMapping("/login")
@@ -58,12 +63,12 @@ public class UserController {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
         model.addAttribute("user", user);
-        return "user-home"; // Render user's home page
+        return "user-home";
     }
 
     @GetMapping("/logout")
     public String logout(HttpSession session) {
-        session.invalidate(); // Clear the session
+        session.invalidate();
         return "redirect:/users/login";
     }
 
@@ -79,32 +84,34 @@ public class UserController {
             userDto.setEmailId(user.get().getEmailId());
             userDto.setPhoneNumber(user.get().getPhoneNumber());
             userDto.setAge(user.get().getAge());
-            userDto.setDob(user.get().getDob());
+//            userDto.setDob(user.get().getDob());
             userDto.setPassword(user.get().getPassword());
             //userDto.setProfileImage(user.get().getProfileImage());
             return ResponseEntity.ok(userDto);
         }
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<String> createUser(@RequestBody UserDto userDto) {
-        User user = new User();
-        user.setFirstName(userDto.getFirstName());
-        user.setLastName(userDto.getLastName());
-        user.setEmailId(userDto.getEmailId());
-        user.setPhoneNumber(userDto.getPhoneNumber());
-        user.setAge(userDto.getAge());
-        user.setDob(userDto.getDob());
-        user.setPassword(userDto.getPassword());
-        //user.setProfileImage(userDto.getProfileImage());
-
-        //byte[] sampleData = {1, 2, 3, 4, 5};
-        //user.setProfileImage(sampleData);
-
-        userRepository.save(user);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body("User created successfully");
+    @GetMapping("/create")
+    public String showCreateUserForm(Model model) {
+        model.addAttribute("userDto", new UserDto());
+        return "sign_up_form";
     }
+
+    @PostMapping("/create")
+    public String createUser(UserDto userDto, @RequestParam("profileImage") MultipartFile file, RedirectAttributes redirectAttributes, HttpSession session) {
+        try {
+            User user = userRegistrationService.registerUser(userDto, file);
+            redirectAttributes.addFlashAttribute("user", user);
+            session.setAttribute("userId", user.getId());
+            session.setAttribute("userName", user.getFirstName());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "redirect:/users/create?error=true";
+        }
+
+        return "redirect:/users/home";
+    }
+
 
     @PutMapping("/update/{id}")
     public ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
@@ -119,7 +126,7 @@ public class UserController {
         user.setEmailId(userDto.getEmailId());
         user.setPhoneNumber(userDto.getPhoneNumber());
         user.setAge(userDto.getAge());
-        user.setDob(userDto.getDob());
+//        user.setDob(userDto.getDob());
         user.setPassword(userDto.getPassword());
         //user.setProfileImage(userDto.getProfileImage());
 
