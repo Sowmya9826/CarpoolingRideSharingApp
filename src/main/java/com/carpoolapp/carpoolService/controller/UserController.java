@@ -28,49 +28,21 @@ public class UserController {
     private UserRegistrationService userRegistrationService;
 
 
-    @GetMapping("/")
-    public String index() {
-        return "sign_up_form";
-    }
-
-    @GetMapping("/login")
-    public String showLoginPage() {
-        return "login";
-    }
-
-    @PostMapping("/login")
-    public String login(@RequestParam String emailId, @RequestParam String password, HttpSession session) {
-        User user = userRepository.findByEmailId(emailId)
-                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
-
-        if (user.getPassword().equals(password)) {
-            // Initialize session
+    @PostMapping("/create")
+    public String createUser(UserDto userDto, @RequestParam("profileImage") MultipartFile file, RedirectAttributes redirectAttributes, HttpSession session) {
+        try {
+            User user = userRegistrationService.registerUser(userDto, file);
+            redirectAttributes.addFlashAttribute("user", user);
             session.setAttribute("userId", user.getId());
             session.setAttribute("userName", user.getFirstName());
-            return "redirect:/users/home";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "redirect:/users/create?error=true";
         }
 
-        return "redirect:/users/login?error=true";
+        return "redirect:/home";
     }
 
-    @GetMapping("/home")
-    public String userHome(HttpSession session, Model model) {
-        Long userId = (Long) session.getAttribute("userId");
-        if (userId == null) {
-            return "redirect:/users/login"; // Redirect to login if not logged in
-        }
-
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-
-        model.addAttribute("user", user);
-        return "user-home";
-    }
-
-    @GetMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate();
-        return "redirect:/users/login";
-    }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
@@ -89,27 +61,6 @@ public class UserController {
             //userDto.setProfileImage(user.get().getProfileImage());
             return ResponseEntity.ok(userDto);
         }
-    }
-
-    @GetMapping("/create")
-    public String showCreateUserForm(Model model) {
-        model.addAttribute("userDto", new UserDto());
-        return "sign_up_form";
-    }
-
-    @PostMapping("/create")
-    public String createUser(UserDto userDto, @RequestParam("profileImage") MultipartFile file, RedirectAttributes redirectAttributes, HttpSession session) {
-        try {
-            User user = userRegistrationService.registerUser(userDto, file);
-            redirectAttributes.addFlashAttribute("user", user);
-            session.setAttribute("userId", user.getId());
-            session.setAttribute("userName", user.getFirstName());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "redirect:/users/create?error=true";
-        }
-
-        return "redirect:/users/home";
     }
 
 
