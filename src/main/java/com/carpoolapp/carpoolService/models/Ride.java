@@ -10,6 +10,7 @@ import java.util.Date;
 @Entity
 @Data
 public class Ride {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,6 +29,7 @@ public class Ride {
     @ManyToOne
     @JoinColumn(name = "destinationLocationId")
     private Location destinationLocation;
+
     private Date startTime;
     private Date endTime;
     private int availableSeats;

@@ -7,6 +7,7 @@ import java.util.Date;
 @Entity
 @Data
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -16,7 +17,6 @@ public class User {
     private String emailId;
     private String phoneNumber;
     private String password;
-    private int age;
     private Date dob;
 
     @Lob

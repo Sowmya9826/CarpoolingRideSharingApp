@@ -2,6 +2,7 @@ package com.carpoolapp.carpoolService.controller;
 
 import com.carpoolapp.carpoolService.models.User;
 import com.carpoolapp.carpoolService.respository.UserRepository;
+import com.carpoolapp.carpoolService.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,6 +17,9 @@ public class HomeController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserService userService;
+
     @GetMapping({"/", "/home"})
     public String userHome(HttpSession session, Model model) {
         Long userId = (Long) session.getAttribute("userId");
@@ -25,14 +29,8 @@ public class HomeController {
 
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Convert profile image to Base64 string
-        String profileImage = null;
-        if (user.getProfileImage() != null) {
-            profileImage = Base64.getEncoder().encodeToString(user.getProfileImage());
-        }
-
         model.addAttribute("user", user);
-        model.addAttribute("profileImage", profileImage);
+        userService.addProfileImageToUIModel(user, model);
 
         return "home";
     }

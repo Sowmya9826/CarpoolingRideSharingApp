@@ -6,14 +6,11 @@ import com.carpoolapp.carpoolService.respository.UserRepository;
 import com.carpoolapp.carpoolService.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.util.Optional;
 
 @Controller
 @RequestMapping("/users")
@@ -40,57 +37,42 @@ public class UserController {
     }
 
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        } else {
-            UserDto userDto = new UserDto();
-            userDto.setFirstName(user.get().getFirstName());
-            userDto.setLastName(user.get().getLastName());
-            userDto.setEmailId(user.get().getEmailId());
-            userDto.setPhoneNumber(user.get().getPhoneNumber());
-            userDto.setAge(user.get().getAge());
-//            userDto.setDob(user.get().getDob());
-            userDto.setPassword(user.get().getPassword());
-            //userDto.setProfileImage(user.get().getProfileImage());
-            return ResponseEntity.ok(userDto);
+    @GetMapping("/profile")
+    public String showUserProfile(HttpSession session, Model model) {
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/auth/login";
         }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        model.addAttribute("user", user);
+        userService.addProfileImageToUIModel(user, model);
+
+        return "user_pages/profile";
     }
 
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
-        Optional<User> userOptional = userRepository.findById(id);
-        if (userOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+    @PostMapping("/update")
+    public String updateUserProfile(
+            @ModelAttribute UserDto userDto,
+            @RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/auth/login";
         }
 
-        User user = userOptional.get();
-        user.setFirstName(userDto.getFirstName());
-        user.setLastName(userDto.getLastName());
-        user.setEmailId(userDto.getEmailId());
-        user.setPhoneNumber(userDto.getPhoneNumber());
-        user.setAge(userDto.getAge());
-//        user.setDob(userDto.getDob());
-        user.setPassword(userDto.getPassword());
-        //user.setProfileImage(userDto.getProfileImage());
+        User existingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        //user.setProfileImage(sampleData);
+        userService.updateUser(existingUser, userDto, profileImage);
+        redirectAttributes.addFlashAttribute("message", "Profile updated successfully!");
 
-        userRepository.save(user);
-        return ResponseEntity.ok("User updated successfully");
+        return "redirect:/users/profile";
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
-        Optional<User> userOptional = userRepository.findById(id);
-        if (userOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
-
-        userRepository.delete(userOptional.get());
-        return ResponseEntity.ok("User deleted successfully");
-    }
 }

@@ -7,6 +7,7 @@ import lombok.Data;
 @Entity
 @Data
 public class RideParticipant {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,6 +19,7 @@ public class RideParticipant {
     @ManyToOne
     @JoinColumn(name = "userId", foreignKey = @ForeignKey(name = "fk_ride_user"))
     private User participant;
+
     private RideParticipateRole role;
 }
 

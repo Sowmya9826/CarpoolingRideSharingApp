@@ -9,7 +9,5 @@ public class UserDto {
     private String emailId;
     private String phoneNumber;
     private String password;
-    //private String ProfileImage;
-    private int age;
     private String dob;
 }
