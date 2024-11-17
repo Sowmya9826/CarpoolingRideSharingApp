@@ -3,6 +3,7 @@ package com.carpoolapp.carpoolService.service;
 import com.carpoolapp.carpoolService.dto.UserDto;
 import com.carpoolapp.carpoolService.models.User;
 import com.carpoolapp.carpoolService.respository.UserRepository;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,11 +13,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Service
-public class UserRegistrationService {
+public class UserService {
 
     private final UserRepository userRepository;
 
-    public UserRegistrationService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -46,5 +47,10 @@ public class UserRegistrationService {
         userRepository.save(user);
 
         return user;
+    }
+
+    public void initializeUserSession(HttpSession session, User user) {
+        session.setAttribute("userId", user.getId());
+        session.setAttribute("userName", user.getFirstName());
     }
 }

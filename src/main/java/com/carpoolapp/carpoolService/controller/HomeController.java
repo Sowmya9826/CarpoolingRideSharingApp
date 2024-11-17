@@ -8,6 +8,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.util.Base64;
+
 @Controller
 public class HomeController {
 
@@ -23,7 +25,15 @@ public class HomeController {
 
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
+        // Convert profile image to Base64 string
+        String profileImage = null;
+        if (user.getProfileImage() != null) {
+            profileImage = Base64.getEncoder().encodeToString(user.getProfileImage());
+        }
+
         model.addAttribute("user", user);
+        model.addAttribute("profileImage", profileImage);
+
         return "home";
     }
 }

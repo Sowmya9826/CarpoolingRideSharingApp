@@ -1,0 +1,79 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+/* Header Styles */
+h1 {
+    color: #333;
+    text-align: center;
+    padding: 20px 0;
+}
+
+/* Profile Image */
+img {
+    display: block;
+    margin: 20px auto;
+    border-radius: 50%;
+    border: 3px solid #ddd;
+}
+
+/* Links */
+a {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    color: #007BFF;
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Center Content */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Button Styles */
+button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Custom pastel purple/violet color for navbar */
+.navbar-pastel {
+    background-color: #9966cc; /* Amethyst */
+    color: white;
+}
+
+.navbar-pastel .navbar-brand,
+.navbar-pastel .btn {
+    background-color: white;
+    color: #9966cc; /* Amethyst */
+}
+
+.navbar-pastel .navbar-brand:hover,
+.navbar-pastel .btn:hover {
+    color: #8a2be2; /* Slightly lighter white for hover effect */
+}
