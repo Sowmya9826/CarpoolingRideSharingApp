@@ -1,8 +1,11 @@
 package com.carpoolapp.carpoolService.models;
 
+import com.carpoolapp.carpoolService.models.enums.RideParticipantStatus;
 import com.carpoolapp.carpoolService.models.enums.RideParticipateRole;
 import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.Date;
 
 @Entity
 @Data
@@ -21,6 +24,11 @@ public class RideParticipant {
     private User participant;
 
     private RideParticipateRole role;
+
+    @Enumerated(EnumType.STRING)
+    private RideParticipantStatus status;
+
+    private Date cancelledAt;
 }
 
 

@@ -1,20 +1,22 @@
 package com.carpoolapp.carpoolService.dto;
 
-import com.carpoolapp.carpoolService.models.Location;
-import com.carpoolapp.carpoolService.models.Vehicle;
-import com.carpoolapp.carpoolService.models.enums.RideStatus;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 @Data
 public class RideDto {
 
-    private Vehicle vehicle;
-    private Location pickupLocation;
-    private Location destinationLocation;
-    private RideStatus status;
-    private Date startTime;
-    private Date endTime;
-    private int availableSeats;
-    private Date createdDate;
+    private Long vehicleId;
+    private double startLatitude;
+    private double startLongitude;
+    private double endLatitude;
+    private double endLongitude;
+    private LocalTime startTime;
+    private LocalTime endTime;
+    private boolean isRecurring;
+    private String daysOfWeek;
+    private LocalDate date;
+    private LocalDate createdDate;
 }
