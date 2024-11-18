@@ -23,6 +23,11 @@ public class RideService {
             RestTemplate restTemplate = new RestTemplate();
             String response = restTemplate.getForObject(url, String.class);
 
+            // if the response is null or error, set the end time to 30 minutes after the start time
+            if (response == null || response.contains("error_message")) {
+                return startTime.plusMinutes(30);
+            }
+
             JSONObject json = new JSONObject(response);
             int durationInSeconds = json
                     .getJSONArray("rows")
