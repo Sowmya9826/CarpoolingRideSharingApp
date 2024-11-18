@@ -1,9 +1,12 @@
 package com.carpoolapp.carpoolService.models;
 
 import com.carpoolapp.carpoolService.models.enums.RideStatus;
+import com.carpoolapp.carpoolService.models.enums.RideType;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Date;
 
 
@@ -26,12 +29,17 @@ public class Ride {
     @Enumerated(EnumType.STRING)
     private RideStatus status;
 
+    @Enumerated(EnumType.STRING)
+    private RideType type;
+
     @ManyToOne
     @JoinColumn(name = "destinationLocationId")
     private Location destinationLocation;
 
-    private Date startTime;
-    private Date endTime;
+    private LocalTime startTime;
+    private LocalTime endTime;
+    private Date date;
+    private String daysOfWeek;
     private int availableSeats;
     private Date createdDate;
 }

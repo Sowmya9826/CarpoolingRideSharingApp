@@ -18,7 +18,22 @@
       width: 100%;
       margin-bottom: 20px;
     }
+    .hidden {
+      display: none;
+    }
   </style>
+  <script>
+    function toggleRideTypeFields() {
+      const rideType = document.querySelector('input[name="isRecurring"]:checked').value;
+      if (rideType === "true") {
+        document.getElementById("recurringFields").classList.remove("hidden");
+        document.getElementById("oneTimeFields").classList.add("hidden");
+      } else {
+        document.getElementById("recurringFields").classList.add("hidden");
+        document.getElementById("oneTimeFields").classList.remove("hidden");
+      }
+    }
+  </script>
 </head>
 <body>
 <!-- Navigation Bar -->
@@ -58,18 +73,69 @@
       <input type="hidden" id="endLongitude" name="endLongitude">
     </div>
 
-    <!-- Start Time -->
+    <!-- Ride Type -->
     <div class="mb-3">
+      <label class="form-label">Ride Type:</label><br>
+      <div class="form-check form-check-inline">
+        <input type="radio" id="oneTime" name="isRecurring" class="form-check-input" value="false" checked onclick="toggleRideTypeFields()">
+        <label for="oneTime" class="form-check-label">One-Time</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input type="radio" id="recurring" name="isRecurring" class="form-check-input" value="true" onclick="toggleRideTypeFields()">
+        <label for="recurring" class="form-check-label">Recurring</label>
+      </div>
+    </div>
+
+    <!-- One-Time Ride Fields -->
+    <div id="oneTimeFields" class="mb-3">
+      <label for="date" class="form-label">Ride Date:</label>
+      <input type="date" id="date" name="date" class="form-control"><br>
+
       <label for="startTime" class="form-label">Start Time:</label>
-      <input type="datetime-local" id="startTime" name="startTime" class="form-control" required><br>
+      <input type="time" id="startTime" name="startTime" class="form-control">
+    </div>
+
+    <!-- Recurring Ride Fields -->
+    <div id="recurringFields" class="mb-3 hidden">
+      <label for="daysOfWeek" class="form-label">Days of the Week:</label>
+      <div class="form-check">
+        <input type="checkbox" id="monday" name="daysOfWeek" value="MON" class="form-check-input">
+        <label for="monday" class="form-check-label">Monday</label>
+      </div>
+      <div class="form-check">
+        <input type="checkbox" id="tuesday" name="daysOfWeek" value="TUE" class="form-check-input">
+        <label for="tuesday" class="form-check-label">Tuesday</label>
+      </div>
+      <div class="form-check">
+        <input type="checkbox" id="wednesday" name="daysOfWeek" value="WED" class="form-check-input">
+        <label for="wednesday" class="form-check-label">Wednesday</label>
+      </div>
+      <div class="form-check">
+        <input type="checkbox" id="thursday" name="daysOfWeek" value="THU" class="form-check-input">
+        <label for="thursday" class="form-check-label">Thursday</label>
+      </div>
+      <div class="form-check">
+        <input type="checkbox" id="friday" name="daysOfWeek" value="FRI" class="form-check-input">
+        <label for="friday" class="form-check-label">Friday</label>
+      </div>
+      <div class="form-check">
+        <input type="checkbox" id="saturday" name="daysOfWeek" value="SAT" class="form-check-input">
+        <label for="saturday" class="form-check-label">Saturday</label>
+      </div>
+      <div class="form-check">
+        <input type="checkbox" id="sunday" name="daysOfWeek" value="SUN" class="form-check-input">
+        <label for="sunday" class="form-check-label">Sunday</label>
+      </div>
+
+      <label for="recurringStartTime" class="form-label">Start Time:</label>
+      <input type="time" id="recurringStartTime" name="startTime" class="form-control">
     </div>
 
     <!-- Vehicle Dropdown -->
     <label for="vehicle" class="form-label">Select Vehicle:</label>
-    <select id="vehicle" name="vehicleId" class="form-control" required>
+    <select id="vehicle" name="vehicleId" class="form-select" required>
       <option value="" disabled selected>Choose your vehicle</option>
-      <!-- Options will be populated dynamically -->
-      <option th:each="vehicle : ${vehicles}" th:value="${vehicle.id}" th:text="${vehicle.name}"></option>
+      <option th:each="vehicle : ${vehicles}" th:value="${vehicle.id}" th:text="${vehicle.name + ', ' + vehicle.number}"></option>
     </select><br>
 
     <!-- Submit Button -->
