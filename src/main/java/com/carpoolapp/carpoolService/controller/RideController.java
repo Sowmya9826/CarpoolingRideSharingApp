@@ -5,18 +5,20 @@ import com.carpoolapp.carpoolService.models.Location;
 import com.carpoolapp.carpoolService.models.Ride;
 import com.carpoolapp.carpoolService.models.Vehicle;
 import com.carpoolapp.carpoolService.models.enums.RideStatus;
+import com.carpoolapp.carpoolService.models.enums.RideType;
+import com.carpoolapp.carpoolService.respository.LocationRepository;
 import com.carpoolapp.carpoolService.respository.RideRepository;
 import com.carpoolapp.carpoolService.respository.VehicleRepository;
+import com.carpoolapp.carpoolService.service.RideService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,6 +32,26 @@ public class RideController {
 
     @Autowired
     private VehicleRepository vehicleRepository;
+
+    @Autowired
+    private LocationRepository locationRepository;
+
+    @Autowired
+    private RideService rideService;
+
+
+    @GetMapping("/")
+    public String showRidesPage(HttpSession session, Model model) {
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/auth/login";
+        }
+//
+//        List<Ride> rides = rideRepository.findAll();
+//        model.addAttribute("rides", rides);
+
+        return "rides/show_rides";
+    }
 
 
     @GetMapping("/create")
@@ -63,33 +85,37 @@ public class RideController {
         ride.setVehicle(vehicleOptional.get());
 
         Location pickupLocation = new Location();
-        pickupLocation.setLatitude(rideDto.getPickupLatitude());
-        pickupLocation.setLongitude(rideDto.getPickupLongitude());
+        pickupLocation.setLatitude(rideDto.getStartLatitude());
+        pickupLocation.setLongitude(rideDto.getStartLongitude());
         pickupLocation.setAddress("Pickup Address");
+        locationRepository.save(pickupLocation);
         ride.setPickupLocation(pickupLocation);
 
         Location destinationLocation = new Location();
         destinationLocation.setLatitude(rideDto.getEndLatitude());
         destinationLocation.setLongitude(rideDto.getEndLongitude());
         destinationLocation.setAddress("Destination Address");
+        locationRepository.save(destinationLocation);
         ride.setDestinationLocation(destinationLocation);
 
         ride.setStatus(RideStatus.CREATED);
         ride.setStartTime(rideDto.getStartTime());
-        ride.setEndTime(rideDto.getEndTime());
+        ride.setEndTime(rideService.calculateEndTime(rideDto.getStartLatitude(), rideDto.getStartLongitude(), rideDto.getEndLatitude(), rideDto.getEndLongitude(), rideDto.getStartTime()));
         ride.setAvailableSeats(vehicleOptional.get().getSeatCount() - 1); // Driver's seat
-        ride.setCreatedDate(new Date());
+        ride.setCreatedDate(LocalDateTime.now(ZoneId.of("UTC")).toLocalDate());
 
-        if (rideDto.isRecurring()) {
-            ride.setDaysOfWeek(rideDto.getDaysOfWeek());
-        } else {
+        if (rideDto.getDate() != null) {
             ride.setDate(rideDto.getDate());
+            ride.setType(RideType.ONE_TIME);
+        } else {
+            ride.setDaysOfWeek(rideDto.getDaysOfWeek());
+            ride.setType(RideType.RECURRING);
         }
 
         rideRepository.save(ride);
         redirectAttributes.addFlashAttribute("message", "Ride created successfully!");
 
-        return "redirect:/rides";
+        return "redirect:/rides/";
     }
 
 //    /**

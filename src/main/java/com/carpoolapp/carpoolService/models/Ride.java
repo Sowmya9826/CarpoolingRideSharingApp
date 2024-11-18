@@ -38,8 +38,8 @@ public class Ride {
 
     private LocalTime startTime;
     private LocalTime endTime;
-    private Date date;
+    private LocalDate date;
     private String daysOfWeek;
     private int availableSeats;
-    private Date createdDate;
+    private LocalDate createdDate;
 }

@@ -34,3 +34,4 @@ build/
 
 ### API Keys ###
 /src/main/resources/static/js/config.js
+/src/main/resources/application-secrets.properties
