@@ -33,5 +33,5 @@ public class Ride {
     private Date startTime;
     private Date endTime;
     private int availableSeats;
-    private Date createdDate = new Date();
+    private Date createdDate;
 }

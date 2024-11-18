@@ -2,11 +2,15 @@ package com.carpoolapp.carpoolService.controller;
 
 import com.carpoolapp.carpoolService.dto.RideDto;
 import com.carpoolapp.carpoolService.models.Ride;
+import com.carpoolapp.carpoolService.models.Vehicle;
 import com.carpoolapp.carpoolService.respository.RideRepository;
+import com.carpoolapp.carpoolService.respository.VehicleRepository;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +23,28 @@ public class RideController {
 
     @Autowired
     private RideRepository rideRepository;
+
+    @Autowired
+    private VehicleRepository vehicleRepository;
+
+
+    @GetMapping("/create")
+    public String showCreateRidePage(HttpSession session, Model model) {
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/auth/login";
+        }
+
+        // Fetch the user's vehicles
+        List<Vehicle> vehicles = vehicleRepository.findAll().stream()
+                .filter(vehicle -> vehicle.getOwner() != null && vehicle.getOwner().getId().equals(userId))
+                .collect(Collectors.toList());
+
+        model.addAttribute("vehicles", vehicles);
+
+        return "rides/create_ride_form";
+    }
+
 
     @PostMapping("/create")
     public ResponseEntity<String> createRide(@RequestBody RideDto rideDto) {

@@ -14,7 +14,7 @@ h1 {
 }
 
 /* Profile Image */
-img {
+img.profile-image-class {
     display: block;
     margin: 20px auto;
     border-radius: 50%;
@@ -61,6 +61,10 @@ button:hover {
     background-color: #0056b3;
 }
 
+button.maps-loc-select {
+    margin-top: 0;
+}
+
 /* Custom pastel purple/violet color for navbar */
 .navbar-pastel {
     background-color: #9966cc; /* Amethyst */
@@ -103,4 +107,13 @@ button:hover {
 .action-button {
   width: 150px; /* Set your desired width */
   margin: 5px;  /* Add consistent spacing */
+}
+
+#map {
+  height: 400px; /* Fixed height */
+  width: 100%; /* Ensure it spans the container */
+  margin-bottom: 20px;
+  background-color: #e0e0e0; /* Fallback color if the map doesn't load */
+  border-radius: 10px; /* Matches other design elements */
+  overflow: hidden; /* Prevent artifacts */
 }
