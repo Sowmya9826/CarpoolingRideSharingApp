@@ -1,7 +1,6 @@
 package com.carpoolapp.carpoolService.dto;
 
 import com.carpoolapp.carpoolService.models.Location;
-import com.carpoolapp.carpoolService.models.Vehicle;
 import com.carpoolapp.carpoolService.models.enums.RideParticipateRole;
 import lombok.Data;
 

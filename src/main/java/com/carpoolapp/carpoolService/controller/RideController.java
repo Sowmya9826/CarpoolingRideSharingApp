@@ -1,6 +1,7 @@
 package com.carpoolapp.carpoolService.controller;
 
 import com.carpoolapp.carpoolService.dto.RideDto;
+import com.carpoolapp.carpoolService.dto.RideParticipantDto;
 import com.carpoolapp.carpoolService.dto.UserRideInfoDto;
 import com.carpoolapp.carpoolService.models.*;
 import com.carpoolapp.carpoolService.models.enums.RideParticipantStatus;
@@ -14,6 +15,7 @@ import com.carpoolapp.carpoolService.respository.VehicleRepository;
 import com.carpoolapp.carpoolService.service.LocationService;
 import com.carpoolapp.carpoolService.service.RideParticipantService;
 import com.carpoolapp.carpoolService.service.RideService;
+import com.carpoolapp.carpoolService.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -47,6 +49,9 @@ public class RideController {
     private LocationService locationService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private RideParticipantService rideParticipantService;
 
     @Autowired
@@ -70,6 +75,35 @@ public class RideController {
         model.addAttribute("upcomingRides", upcomingRides);
 
         return "rides/show_rides";
+    }
+
+
+    @GetMapping("/{id}")
+    public String showRideDetails(@PathVariable Long id, HttpSession session, Model model) {
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/auth/login";
+        }
+
+        Optional<Ride> rideOptional = rideRepository.findById(id);
+        if (rideOptional.isEmpty()) {
+            return "redirect:/rides/";
+        }
+
+        Ride ride = rideOptional.get();
+        Vehicle vehicle = ride.getVehicle();
+        Location startLocation = ride.getPickupLocation();
+        Location endLocation = ride.getDestinationLocation();
+        List<RideParticipantDto> rideParticipants = rideParticipantRepository.getActiveRidePassengersDetails(id);
+        userService.addProfileImagesToRideParticipantDto(rideParticipants);
+
+        model.addAttribute("ride", ride);
+        model.addAttribute("vehicle", vehicle);
+        model.addAttribute("startLocation", startLocation);
+        model.addAttribute("endLocation", endLocation);
+        model.addAttribute("rideParticipants", rideParticipants);
+
+        return "rides/view_ride_details";
     }
 
 
