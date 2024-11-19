@@ -1,8 +1,6 @@
 package com.carpoolapp.carpoolService.controller;
 
-import com.carpoolapp.carpoolService.dto.RideDto;
-import com.carpoolapp.carpoolService.dto.RideParticipantDto;
-import com.carpoolapp.carpoolService.dto.UserRideInfoDto;
+import com.carpoolapp.carpoolService.dto.*;
 import com.carpoolapp.carpoolService.models.*;
 import com.carpoolapp.carpoolService.models.enums.RideParticipantStatus;
 import com.carpoolapp.carpoolService.models.enums.RideParticipateRole;
@@ -172,6 +170,10 @@ public class RideController {
             rideParticipantService.markRideParticipantsAsCancelled(ride);
         } else {
             rideParticipantService.markRideParticipantAsCancelled(ride, userId);
+
+            // increase the available seats in the ride
+            ride.setAvailableSeats(ride.getAvailableSeats() + 1);
+            rideRepository.save(ride);
         }
 
         redirectAttributes.addFlashAttribute("message", "Ride cancelled successfully!");
@@ -180,87 +182,38 @@ public class RideController {
     }
 
 
+    @GetMapping("/find")
+    public String showFindRidesPage(HttpSession session, Model model) {
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/auth/login";
+        }
+
+        return "rides/find_rides_form";
+    }
 
 
-//    /**
-//     * Get a ride by ID
-//     * GET: /rides/{id}
-//     */
-//    @GetMapping("/{id}")
-//    public ResponseEntity<RideDto> getRideById(@PathVariable Long id) {
-//        Optional<Ride> ride = rideRepository.findById(id);
-//        if (ride.isEmpty()) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-//        } else {
-//            RideDto rideDto = convertToDto(ride.get());
-//            return ResponseEntity.ok(rideDto);
-//        }
-//    }
-//
-//    /**
-//     * Find all rides
-//     * GET: /rides/find
-//     */
-//    @GetMapping("/find")
-//    public ResponseEntity<List<RideDto>> findAllRides() {
-//        List<Ride> rides = rideRepository.findAll();
-//        List<RideDto> rideDtos = rides.stream().map(this::convertToDto).collect(Collectors.toList());
-//        return ResponseEntity.ok(rideDtos);
-//    }
-//
-//    /**
-//     * Update an existing ride
-//     * PUT: /rides/update/{id}
-//     */
-//    @PutMapping("/update/{id}")
-//    public ResponseEntity<String> updateRide(@PathVariable Long id, @RequestBody RideDto rideDto) {
-//        Optional<Ride> rideOptional = rideRepository.findById(id);
-//        if (rideOptional.isEmpty()) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ride not found");
-//        }
-//
-//        Ride ride = rideOptional.get();
-//        ride.setVehicle(rideDto.getVehicle());
-//        ride.setPickupLocation(rideDto.getPickupLocation());
-//        ride.setDestinationLocation(rideDto.getDestinationLocation());
-//        ride.setStatus(rideDto.getStatus());
-//        ride.setStartTime(rideDto.getStartTime());
-//        ride.setEndTime(rideDto.getEndTime());
-//        ride.setAvailableSeats(rideDto.getAvailableSeats());
-//        ride.setCreatedDate(rideDto.getCreatedDate());
-//
-//        rideRepository.save(ride);
-//        return ResponseEntity.ok("Ride updated successfully");
-//    }
-//
-//    /**
-//     * Delete a ride by ID
-//     * DELETE: /rides/delete/{id}
-//     */
-//    @DeleteMapping("/delete/{id}")
-//    public ResponseEntity<String> deleteRide(@PathVariable Long id) {
-//        Optional<Ride> rideOptional = rideRepository.findById(id);
-//        if (rideOptional.isEmpty()) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ride not found");
-//        }
-//
-//        rideRepository.delete(rideOptional.get());
-//        return ResponseEntity.ok("Ride deleted successfully");
-//    }
-//
-//    /**
-//     * Convert Ride entity to RideDto
-//     */
-//    private RideDto convertToDto(Ride ride) {
-//        RideDto rideDto = new RideDto();
-//        rideDto.setVehicle(ride.getVehicle());
-//        rideDto.setPickupLocation(ride.getPickupLocation());
-//        rideDto.setDestinationLocation(ride.getDestinationLocation());
-//        rideDto.setStatus(ride.getStatus());
-//        rideDto.setStartTime(ride.getStartTime());
-//        rideDto.setEndTime(ride.getEndTime());
-//        rideDto.setAvailableSeats(ride.getAvailableSeats());
-//        rideDto.setCreatedDate(ride.getCreatedDate());
-//        return rideDto;
-//    }
+    @PostMapping("/find")
+    public String findMatchingRides(FindRideDto findRideDto, HttpSession session, Model model) {
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/auth/login";
+        }
+
+        List<MatchingRideDto> matchingRides = rideService.findMatchingRidesByEndTimeAndProximity(
+                userId,
+                findRideDto.getDate(),
+                findRideDto.getEndTime(),
+                findRideDto.getStartLatitude(),
+                findRideDto.getStartLongitude(),
+                findRideDto.getEndLatitude(),
+                findRideDto.getEndLongitude(),
+                2.0
+        );
+
+        model.addAttribute("matchingRides", matchingRides);
+
+        return "rides/show_matching_rides";
+    }
+
 }
