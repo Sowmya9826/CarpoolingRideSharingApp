@@ -1,9 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html>
 <head>
-  <title>Home</title>
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <title>Show Rides</title>
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Custom CSS -->
@@ -43,10 +41,94 @@
 </nav>
 
 
-<!-- Main Content -->
-<div class="container mt-5">
-  <h1 class="text-center"> Your Rides </h1>
 
+<!-- <!-- Main Content --> 
+<!-- >>>>>>> main -->
+<div class="container mt-5">
+  <h1 class="text-center">Your Rides</h1>
+
+  <!-- Display Message -->
+  <div th:if="${message}" class="alert alert-success text-center">
+      <p th:text="${message}"></p>
+  </div>
+
+  <!-- Tabs for Upcoming and Past Rides -->
+  <ul class="nav nav-tabs" id="ridesTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="upcoming-tab" data-bs-toggle="tab" data-bs-target="#upcoming" type="button" role="tab" aria-controls="upcoming" aria-selected="true">
+        Upcoming Rides
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="recurring-tab" data-bs-toggle="tab" data-bs-target="#recurring" type="button" role="tab" aria-controls="recurring" aria-selected="false">
+        Recurring Rides
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="past-tab" data-bs-toggle="tab" data-bs-target="#past" type="button" role="tab" aria-controls="past" aria-selected="false">
+        Past Rides
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content mt-3" id="ridesTabContent">
+    <!-- Upcoming Rides -->
+    <div class="tab-pane fade show active" id="upcoming" role="tabpanel" aria-labelledby="upcoming-tab">
+      <div th:each="rideInfo : ${upcomingRides}" class="card mb-3">
+        <div class="card-body">
+          <p class="card-text">
+            <strong>Starting from:</strong> <span th:text="${rideInfo.pickupLocation.address}">Pickup Address</span><br>
+            <strong>Destination:</strong> <span th:text="${rideInfo.destinationLocation.address}">Destination Address</span><br>
+            <strong>Date:</strong> <span th:text="${rideInfo.date}">Ride Date</span><br>
+            <strong>Start Time:</strong> <span th:text="${rideInfo.startTime}">Ride Time</span><br>
+            <a th:href="@{'/rides/' + ${rideInfo.rideId}}" class="btn btn-primary mt-2">View</a>
+            <a th:href="@{'/rides/' + ${rideInfo.rideId} + '/cancel'}" class="btn btn-primary mt-2">Cancel</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recurring Rides -->
+    <div class="tab-pane fade show active" id="recurring" role="tabpanel" aria-labelledby="recurring-tab">
+      <div th:each="rideInfo : ${recurringRides}" class="card mb-3">
+        <div class="card-body">
+          <p class="card-text">
+            <strong>Starting from:</strong> <span th:text="${rideInfo.pickupLocation.address}">Pickup Address</span><br>
+            <strong>Destination:</strong> <span th:text="${rideInfo.destinationLocation.address}">Destination Address</span><br>
+            <strong>Date:</strong> <span th:text="${rideInfo.date}">Ride Date</span><br>
+            <strong>Start Time:</strong> <span th:text="${rideInfo.startTime}">Ride Time</span><br>
+            <a th:href="@{'/rides/' + ${rideInfo.rideId}}" class="btn btn-primary mt-2">View</a>
+            <a th:href="@{'/rides/' + ${rideInfo.rideId} + '/cancel'}" class="btn btn-primary mt-2">Cancel</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Past Rides -->
+    <div class="tab-pane fade" id="past" role="tabpanel" aria-labelledby="past-tab">
+      <form action="/rides/past" method="get" class="mb-3">
+        <label for="month" class="form-label">Select Month:</label>
+        <input type="month" id="month" name="month" class="form-control" required>
+        <button type="submit" class="btn btn-primary mt-2">Search</button>
+      </form>
+
+      <div th:each="ride : ${pastRides}" class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title" th:text="${ride.vehicle.name}">Vehicle Name</h5>
+          <p class="card-text">
+            <strong>Start:</strong> <span th:text="${ride.pickupLocation.address}">Pickup Address</span><br>
+            <strong>Destination:</strong> <span th:text="${ride.destinationLocation.address}">Destination Address</span><br>
+            <strong>Date:</strong> <span th:text="${ride.date}">Ride Date</span><br>
+            <strong>Time:</strong> <span th:text="${ride.time}">Ride Time</span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

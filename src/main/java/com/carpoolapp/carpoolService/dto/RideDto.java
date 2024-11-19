@@ -11,8 +11,10 @@ public class RideDto {
     private Long vehicleId;
     private double startLatitude;
     private double startLongitude;
+    private String startAddress;
     private double endLatitude;
     private double endLongitude;
+    private String endAddress;
     private LocalTime startTime;
     private LocalTime endTime;
     private boolean isRecurring;

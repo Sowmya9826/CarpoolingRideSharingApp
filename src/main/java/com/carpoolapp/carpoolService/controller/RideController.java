@@ -1,14 +1,18 @@
 package com.carpoolapp.carpoolService.controller;
 
 import com.carpoolapp.carpoolService.dto.RideDto;
-import com.carpoolapp.carpoolService.models.Location;
-import com.carpoolapp.carpoolService.models.Ride;
-import com.carpoolapp.carpoolService.models.Vehicle;
+import com.carpoolapp.carpoolService.dto.UserRideInfoDto;
+import com.carpoolapp.carpoolService.models.*;
+import com.carpoolapp.carpoolService.models.enums.RideParticipantStatus;
+import com.carpoolapp.carpoolService.models.enums.RideParticipateRole;
 import com.carpoolapp.carpoolService.models.enums.RideStatus;
 import com.carpoolapp.carpoolService.models.enums.RideType;
 import com.carpoolapp.carpoolService.respository.LocationRepository;
+import com.carpoolapp.carpoolService.respository.RideParticipantRepository;
 import com.carpoolapp.carpoolService.respository.RideRepository;
 import com.carpoolapp.carpoolService.respository.VehicleRepository;
+import com.carpoolapp.carpoolService.service.LocationService;
+import com.carpoolapp.carpoolService.service.RideParticipantService;
 import com.carpoolapp.carpoolService.service.RideService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +43,15 @@ public class RideController {
     @Autowired
     private RideService rideService;
 
+    @Autowired
+    private LocationService locationService;
+
+    @Autowired
+    private RideParticipantService rideParticipantService;
+
+    @Autowired
+    private RideParticipantRepository rideParticipantRepository;
+
 
     @GetMapping("/")
     public String showRidesPage(HttpSession session, Model model) {
@@ -46,9 +59,15 @@ public class RideController {
         if (userId == null) {
             return "redirect:/auth/login";
         }
-//
-//        List<Ride> rides = rideRepository.findAll();
-//        model.addAttribute("rides", rides);
+
+        List<UserRideInfoDto> upcomingRides = rideParticipantRepository.findUpcomingRidesForUser(
+                userId,
+                LocalDateTime.now(ZoneId.of("UTC")).toLocalDate(),
+                LocalDateTime.now(ZoneId.of("UTC")).toLocalTime(),
+                RideParticipantStatus.ACTIVE
+        );
+
+        model.addAttribute("upcomingRides", upcomingRides);
 
         return "rides/show_rides";
     }
@@ -74,45 +93,25 @@ public class RideController {
 
     @PostMapping("/create")
     public String createRide(RideDto rideDto, HttpSession session, RedirectAttributes redirectAttributes) {
-        Ride ride = new Ride();
-
         Long vehicleId = rideDto.getVehicleId();
         Optional<Vehicle> vehicleOptional = vehicleRepository.findById(vehicleId);
         if (vehicleOptional.isEmpty()) {
             redirectAttributes.addFlashAttribute("message", "Vehicle not found");
             return "redirect:/rides/create";
         }
-        ride.setVehicle(vehicleOptional.get());
 
-        Location pickupLocation = new Location();
-        pickupLocation.setLatitude(rideDto.getStartLatitude());
-        pickupLocation.setLongitude(rideDto.getStartLongitude());
-        pickupLocation.setAddress("Pickup Address");
-        locationRepository.save(pickupLocation);
-        ride.setPickupLocation(pickupLocation);
+        // Create start and end locations
+        Location startLocation = locationService.createLocation(rideDto.getStartLatitude(), rideDto.getStartLongitude(), rideDto.getStartAddress());
+        Location endLocation = locationService.createLocation(rideDto.getEndLatitude(), rideDto.getEndLongitude(), rideDto.getEndAddress());
 
-        Location destinationLocation = new Location();
-        destinationLocation.setLatitude(rideDto.getEndLatitude());
-        destinationLocation.setLongitude(rideDto.getEndLongitude());
-        destinationLocation.setAddress("Destination Address");
-        locationRepository.save(destinationLocation);
-        ride.setDestinationLocation(destinationLocation);
+        // Create the ride
+        Ride createdRide = rideService.createRide(rideDto, vehicleOptional.get(), startLocation, endLocation);
 
-        ride.setStatus(RideStatus.CREATED);
-        ride.setStartTime(rideDto.getStartTime());
-        ride.setEndTime(rideService.calculateEndTime(rideDto.getStartLatitude(), rideDto.getStartLongitude(), rideDto.getEndLatitude(), rideDto.getEndLongitude(), rideDto.getStartTime()));
-        ride.setAvailableSeats(vehicleOptional.get().getSeatCount() - 1); // Driver's seat
-        ride.setCreatedDate(LocalDateTime.now(ZoneId.of("UTC")).toLocalDate());
+        // create a ride participant for the driver
+        User driver = vehicleOptional.get().getOwner();
+        rideParticipantService.createRideParticipantAsDriver(createdRide, driver);
 
-        if (rideDto.getDate() != null) {
-            ride.setDate(rideDto.getDate());
-            ride.setType(RideType.ONE_TIME);
-        } else {
-            ride.setDaysOfWeek(rideDto.getDaysOfWeek());
-            ride.setType(RideType.RECURRING);
-        }
 
-        rideRepository.save(ride);
         redirectAttributes.addFlashAttribute("message", "Ride created successfully!");
 
         return "redirect:/rides/";
