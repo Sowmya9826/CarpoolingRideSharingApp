@@ -151,6 +151,37 @@ public class RideController {
         return "redirect:/rides/";
     }
 
+
+    @PostMapping("/{id}/cancel")
+    public String cancelRide(@PathVariable Long id, HttpSession session, RedirectAttributes redirectAttributes) {
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/auth/login";
+        }
+
+        Optional<Ride> rideOptional = rideRepository.findById(id);
+        if (rideOptional.isEmpty()) {
+            return "redirect:/rides/";
+        }
+
+        // if the user is the driver, cancel the ride and all the participants, else cancel the user from the ride
+        Ride ride = rideOptional.get();
+        if (ride.getVehicle().getOwner().getId().equals(userId)) {
+            ride.setStatus(RideStatus.CANCELLED);
+            rideRepository.save(ride);
+            rideParticipantService.markRideParticipantsAsCancelled(ride);
+        } else {
+            rideParticipantService.markRideParticipantAsCancelled(ride, userId);
+        }
+
+        redirectAttributes.addFlashAttribute("message", "Ride cancelled successfully!");
+
+        return "redirect:/rides/";
+    }
+
+
+
+
 //    /**
 //     * Get a ride by ID
 //     * GET: /rides/{id}

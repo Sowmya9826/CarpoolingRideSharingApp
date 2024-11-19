@@ -34,4 +34,20 @@ public class RideParticipantService {
 
         rideParticipantRepository.save(rideParticipant);
     }
+
+    public void markRideParticipantsAsCancelled(Ride ride) {
+        rideParticipantRepository.findByRideId(ride.getId())
+                .forEach(rideParticipant -> {
+                    rideParticipant.setStatus(RideParticipantStatus.CANCELLED);
+                    rideParticipantRepository.save(rideParticipant); // Save explicitly
+                });
+    }
+
+    public void markRideParticipantAsCancelled(Ride ride, Long userId) {
+        // find the ride participant where ride id and user id matches
+        RideParticipant rideParticipant = rideParticipantRepository.findByRideIdAndParticipantId(ride.getId(), userId)
+                .orElseThrow(() -> new RuntimeException("Ride participant not found"));
+
+        rideParticipant.setStatus(RideParticipantStatus.CANCELLED);
+    }
 }
