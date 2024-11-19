@@ -11,13 +11,13 @@
 <!-- Navigation Bar -->
 <nav class="navbar navbar-expand-lg navbar-pastel">
   <div class="container-fluid">
-    <a class="navbar-brand" href="/home">Carpool App</a>
+    <a class="navbar-brand btn btn-outline-primary" href="/home">Carpool App</a>
     <a th:href="@{/auth/logout}" class="btn btn-outline-light">Logout</a>
   </div>
 </nav>
 
 <div class="container mt-5">
-  <h1 class="text-center">Rides</h1>
+  <h1 class="text-center">Your Rides</h1>
 
   <!-- Display Message -->
   <div th:if="${message}" class="alert alert-success text-center">
@@ -32,6 +32,11 @@
       </button>
     </li>
     <li class="nav-item" role="presentation">
+      <button class="nav-link" id="recurring-tab" data-bs-toggle="tab" data-bs-target="#recurring" type="button" role="tab" aria-controls="recurring" aria-selected="false">
+        Recurring Rides
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
       <button class="nav-link" id="past-tab" data-bs-toggle="tab" data-bs-target="#past" type="button" role="tab" aria-controls="past" aria-selected="false">
         Past Rides
       </button>
@@ -41,15 +46,31 @@
   <div class="tab-content mt-3" id="ridesTabContent">
     <!-- Upcoming Rides -->
     <div class="tab-pane fade show active" id="upcoming" role="tabpanel" aria-labelledby="upcoming-tab">
-      <h2>Upcoming Rides</h2>
-      <div th:each="ride : ${upcomingRides}" class="card mb-3">
+      <div th:each="rideInfo : ${upcomingRides}" class="card mb-3">
         <div class="card-body">
-          <h5 class="card-title" th:text="${ride.vehicle.name}">Vehicle Name</h5>
           <p class="card-text">
-            <strong>Start:</strong> <span th:text="${ride.pickupLocation.address}">Pickup Address</span><br>
-            <strong>Destination:</strong> <span th:text="${ride.destinationLocation.address}">Destination Address</span><br>
-            <strong>Date:</strong> <span th:text="${ride.date}">Ride Date</span><br>
-            <strong>Time:</strong> <span th:text="${ride.time}">Ride Time</span>
+            <strong>Starting from:</strong> <span th:text="${rideInfo.pickupLocation.address}">Pickup Address</span><br>
+            <strong>Destination:</strong> <span th:text="${rideInfo.destinationLocation.address}">Destination Address</span><br>
+            <strong>Date:</strong> <span th:text="${rideInfo.date}">Ride Date</span><br>
+            <strong>Start Time:</strong> <span th:text="${rideInfo.startTime}">Ride Time</span><br>
+            <a th:href="@{'/rides/' + ${rideInfo.rideId}}" class="btn btn-primary mt-2">View</a>
+            <a th:href="@{'/rides/' + ${rideInfo.rideId} + '/cancel'}" class="btn btn-primary mt-2">Cancel</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recurring Rides -->
+    <div class="tab-pane fade show active" id="recurring" role="tabpanel" aria-labelledby="recurring-tab">
+      <div th:each="rideInfo : ${recurringRides}" class="card mb-3">
+        <div class="card-body">
+          <p class="card-text">
+            <strong>Starting from:</strong> <span th:text="${rideInfo.pickupLocation.address}">Pickup Address</span><br>
+            <strong>Destination:</strong> <span th:text="${rideInfo.destinationLocation.address}">Destination Address</span><br>
+            <strong>Date:</strong> <span th:text="${rideInfo.date}">Ride Date</span><br>
+            <strong>Start Time:</strong> <span th:text="${rideInfo.startTime}">Ride Time</span><br>
+            <a th:href="@{'/rides/' + ${rideInfo.rideId}}" class="btn btn-primary mt-2">View</a>
+            <a th:href="@{'/rides/' + ${rideInfo.rideId} + '/cancel'}" class="btn btn-primary mt-2">Cancel</a>
           </p>
         </div>
       </div>
@@ -57,7 +78,6 @@
 
     <!-- Past Rides -->
     <div class="tab-pane fade" id="past" role="tabpanel" aria-labelledby="past-tab">
-      <h2>Past Rides</h2>
       <form action="/rides/past" method="get" class="mb-3">
         <label for="month" class="form-label">Select Month:</label>
         <input type="month" id="month" name="month" class="form-control" required>
@@ -76,6 +96,7 @@
         </div>
       </div>
     </div>
+
   </div>
 </div>
 

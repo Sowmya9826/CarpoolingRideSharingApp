@@ -117,3 +117,7 @@ button.maps-loc-select {
   border-radius: 10px; /* Matches other design elements */
   overflow: hidden; /* Prevent artifacts */
 }
+
+.nav-link {
+  color: #9966cc !important; /* Amethyst */
+}

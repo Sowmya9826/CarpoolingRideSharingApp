@@ -1,12 +1,14 @@
 package com.carpoolapp.carpoolService.controller;
 
 import com.carpoolapp.carpoolService.dto.RideDto;
+import com.carpoolapp.carpoolService.dto.UserRideInfoDto;
 import com.carpoolapp.carpoolService.models.*;
 import com.carpoolapp.carpoolService.models.enums.RideParticipantStatus;
 import com.carpoolapp.carpoolService.models.enums.RideParticipateRole;
 import com.carpoolapp.carpoolService.models.enums.RideStatus;
 import com.carpoolapp.carpoolService.models.enums.RideType;
 import com.carpoolapp.carpoolService.respository.LocationRepository;
+import com.carpoolapp.carpoolService.respository.RideParticipantRepository;
 import com.carpoolapp.carpoolService.respository.RideRepository;
 import com.carpoolapp.carpoolService.respository.VehicleRepository;
 import com.carpoolapp.carpoolService.service.LocationService;
@@ -47,6 +49,9 @@ public class RideController {
     @Autowired
     private RideParticipantService rideParticipantService;
 
+    @Autowired
+    private RideParticipantRepository rideParticipantRepository;
+
 
     @GetMapping("/")
     public String showRidesPage(HttpSession session, Model model) {
@@ -55,7 +60,14 @@ public class RideController {
             return "redirect:/auth/login";
         }
 
+        List<UserRideInfoDto> upcomingRides = rideParticipantRepository.findUpcomingRidesForUser(
+                userId,
+                LocalDateTime.now(ZoneId.of("UTC")).toLocalDate(),
+                LocalDateTime.now(ZoneId.of("UTC")).toLocalTime(),
+                RideParticipantStatus.ACTIVE
+        );
 
+        model.addAttribute("upcomingRides", upcomingRides);
 
         return "rides/show_rides";
     }
