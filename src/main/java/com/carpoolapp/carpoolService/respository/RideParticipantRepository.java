@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface RideParticipantRepository extends JpaRepository<RideParticipant, Long> {
     List<RideParticipant> findByRideId(Long rideId);
@@ -34,4 +35,6 @@ public interface RideParticipantRepository extends JpaRepository<RideParticipant
             "WHERE rp.ride.id = :rideId " +
             "AND rp.status = com.carpoolapp.carpoolService.models.enums.RideParticipantStatus.ACTIVE")
     List<RideParticipantDto> getActiveRidePassengersDetails(Long rideId);
+
+    Optional<RideParticipant> findByRideIdAndParticipantId(Long id, Long userId);
 }

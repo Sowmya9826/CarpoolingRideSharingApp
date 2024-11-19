@@ -82,7 +82,10 @@
             <strong>Date:</strong> <span th:text="${rideInfo.date}">Ride Date</span><br>
             <strong>Start Time:</strong> <span th:text="${rideInfo.startTime}">Ride Time</span><br>
             <a th:href="@{'/rides/' + ${rideInfo.rideId}}" class="btn btn-primary mt-2">View</a>
-            <a th:href="@{'/rides/' + ${rideInfo.rideId} + '/cancel'}" class="btn btn-primary mt-2">Cancel</a>
+
+            <form th:action="@{'/rides/' + ${rideInfo.rideId} + '/cancel'}" method="post" style="display: inline;">
+              <button type="submit" class="btn btn-primary mt-2">Cancel</button>
+            </form>
           </p>
         </div>
       </div>
