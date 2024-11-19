@@ -1,5 +1,6 @@
 package com.carpoolapp.carpoolService.service;
 
+import com.carpoolapp.carpoolService.dto.RideParticipantDto;
 import com.carpoolapp.carpoolService.dto.UserDto;
 import com.carpoolapp.carpoolService.models.User;
 import com.carpoolapp.carpoolService.respository.UserRepository;
@@ -13,6 +14,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -51,6 +53,16 @@ public class UserService {
         }
 
         model.addAttribute("profileImage", profileImage);
+    }
+
+    // convert profile images in the list of rideParticipantDto to base64 string
+    public void addProfileImagesToRideParticipantDto(List<RideParticipantDto> rideParticipantDtos) {
+        for (RideParticipantDto rideParticipantDto : rideParticipantDtos) {
+            byte[] profileImage = rideParticipantDto.getProfileImage();
+            if (profileImage != null) {
+                rideParticipantDto.setProfileImageBase64(Base64.getEncoder().encodeToString(profileImage));
+            }
+        }
     }
 
     private void setUserData(User user, UserDto userDto) {
