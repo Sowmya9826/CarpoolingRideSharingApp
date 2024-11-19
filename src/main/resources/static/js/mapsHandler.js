@@ -74,6 +74,50 @@ function initMap() {
   });
 }
 
+// Geocode the address entered by the user and place the marker on the map
+function geocodeAddress(address, markerType) {
+  const geocoder = new google.maps.Geocoder();
+  geocoder.geocode({ address: address }, function(results, status) {
+    if (status === "OK") {
+      const latLng = results[0].geometry.location;
+      const lat = latLng.lat();
+      const lng = latLng.lng();
+
+      // Place marker on the map based on the address
+      if (markerType === "start") {
+        if (startMarker) {
+          startMarker.setMap(null);
+        }
+        startMarker = new google.maps.Marker({
+          position: latLng,
+          map: map,
+          label: "S",
+        });
+        document.getElementById("startLatitude").value = lat;
+        document.getElementById("startLongitude").value = lng;
+        document.getElementById("startAddress").value = results[0].formatted_address;
+      } else if (markerType === "destination") {
+        if (endMarker) {
+          endMarker.setMap(null);
+        }
+        endMarker = new google.maps.Marker({
+          position: latLng,
+          map: map,
+          label: "D",
+        });
+        document.getElementById("endLatitude").value = lat;
+        document.getElementById("endLongitude").value = lng;
+        document.getElementById("endAddress").value = results[0].formatted_address;
+      }
+
+      map.setCenter(latLng); // Center the map on the address
+    } else {
+      alert("Geocoding failed: " + status);
+    }
+  });
+}
+
+// Function to get the address from latitude and longitude
 function getAddress(lat, lng, addressFieldId) {
   const geocoder = new google.maps.Geocoder();
   const latLng = { lat: parseFloat(lat), lng: parseFloat(lng) };
@@ -87,4 +131,5 @@ function getAddress(lat, lng, addressFieldId) {
   });
 }
 
+// Load the Google Maps script
 loadGoogleMapsScript();
