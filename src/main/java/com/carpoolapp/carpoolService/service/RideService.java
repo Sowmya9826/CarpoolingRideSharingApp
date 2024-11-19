@@ -1,5 +1,6 @@
 package com.carpoolapp.carpoolService.service;
 
+import com.carpoolapp.carpoolService.dto.MatchingRideDto;
 import com.carpoolapp.carpoolService.dto.RideDto;
 import com.carpoolapp.carpoolService.models.*;
 import com.carpoolapp.carpoolService.models.enums.RideParticipantStatus;
@@ -15,9 +16,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.json.JSONObject;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class RideService {
@@ -92,5 +96,41 @@ public class RideService {
 
         return savedRide;
     }
+
+
+    public List<MatchingRideDto> findMatchingRidesByEndTimeAndProximity(Long userId, LocalDate date, LocalTime userEndTime,
+                                                             double userStartLat, double userStartLon,
+                                                             double userEndLat, double userEndLon,
+                                                             double proximityThresholdKm) {
+        // Fetch rides based on end time, status, and seat availability
+        LocalTime endTimeMinus = userEndTime.minusMinutes(15);
+        LocalTime endTimePlus = userEndTime.plusMinutes(15);
+        List<MatchingRideDto> matchingRideDtos = rideRepository.findRidesWithLocationsExcludingUser(date, endTimeMinus, endTimePlus, userId);
+
+        // Filter rides further by proximity
+        return matchingRideDtos.stream()
+                .filter(matchingRideDto -> {
+                    // Check proximity for both start and destination locations
+                    double startDistance = haversine(userStartLat, userStartLon,
+                            matchingRideDto.getStartLatitude(), matchingRideDto.getStartLongitude());
+                    double endDistance = haversine(userEndLat, userEndLon,
+                            matchingRideDto.getEndLatitude(), matchingRideDto.getEndLongitude());
+
+                    return startDistance <= proximityThresholdKm && endDistance <= proximityThresholdKm;
+                })
+                .collect(Collectors.toList());
+    }
+
+    private double haversine(double lat1, double lon1, double lat2, double lon2) {
+        final int R = 6371; // Radius of the Earth in km
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c; // Distance in km
+    }
+
 
 }
