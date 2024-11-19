@@ -105,7 +105,6 @@ public class RideService {
         // Fetch rides based on end time, status, and seat availability
         LocalTime endTimeMinus = userEndTime.minusMinutes(15);
         LocalTime endTimePlus = userEndTime.plusMinutes(15);
-//        List<MatchingRideDto> matchingRideDtos = rideRepository.findRidesWithLocationsByTimeAndStatusAndSeats(date, endTimeMinus, endTimePlus);
         List<MatchingRideDto> matchingRideDtos = rideRepository.findRidesWithLocationsExcludingUser(date, endTimeMinus, endTimePlus, userId);
 
         // Filter rides further by proximity

@@ -6,10 +6,7 @@ import com.carpoolapp.carpoolService.models.enums.RideParticipantStatus;
 import com.carpoolapp.carpoolService.models.enums.RideParticipateRole;
 import com.carpoolapp.carpoolService.models.enums.RideStatus;
 import com.carpoolapp.carpoolService.models.enums.RideType;
-import com.carpoolapp.carpoolService.respository.LocationRepository;
-import com.carpoolapp.carpoolService.respository.RideParticipantRepository;
-import com.carpoolapp.carpoolService.respository.RideRepository;
-import com.carpoolapp.carpoolService.respository.VehicleRepository;
+import com.carpoolapp.carpoolService.respository.*;
 import com.carpoolapp.carpoolService.service.LocationService;
 import com.carpoolapp.carpoolService.service.RideParticipantService;
 import com.carpoolapp.carpoolService.service.RideService;
@@ -33,6 +30,9 @@ public class RideController {
 
     @Autowired
     private RideRepository rideRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private VehicleRepository vehicleRepository;
@@ -214,6 +214,34 @@ public class RideController {
         model.addAttribute("matchingRides", matchingRides);
 
         return "rides/show_matching_rides";
+    }
+
+
+    @PostMapping("/{id}/join")
+    public String joinRide(@PathVariable Long id, HttpSession session, RedirectAttributes redirectAttributes) {
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/auth/login";
+        }
+
+        Optional<Ride> rideOptional = rideRepository.findById(id);
+        if (rideOptional.isEmpty()) {
+            return "redirect:/rides/";
+        }
+
+        Ride ride = rideOptional.get();
+
+        // create a ride participant for the passenger
+        User passenger = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        rideParticipantService.createRideParticipantAsPassenger(ride, passenger);
+
+        // decrease the available seats in the ride
+        ride.setAvailableSeats(ride.getAvailableSeats() - 1);
+        rideRepository.save(ride);
+
+        redirectAttributes.addFlashAttribute("message", "Joined the ride successfully!");
+
+        return "redirect:/rides/";
     }
 
 }
