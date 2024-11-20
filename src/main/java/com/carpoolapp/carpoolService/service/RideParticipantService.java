@@ -9,6 +9,8 @@ import com.carpoolapp.carpoolService.respository.RideParticipantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+
 @Service
 public class RideParticipantService {
 
@@ -21,6 +23,7 @@ public class RideParticipantService {
         rideParticipant.setParticipant(user);
         rideParticipant.setStatus(RideParticipantStatus.ACTIVE);
         rideParticipant.setRole(RideParticipateRole.DRIVER);
+        rideParticipant.setJoinedAt(LocalDate.now());
 
         rideParticipantRepository.save(rideParticipant);
     }
@@ -31,6 +34,7 @@ public class RideParticipantService {
         rideParticipant.setParticipant(user);
         rideParticipant.setStatus(RideParticipantStatus.ACTIVE);
         rideParticipant.setRole(RideParticipateRole.PASSENGER);
+        rideParticipant.setJoinedAt(LocalDate.now());
 
         rideParticipantRepository.save(rideParticipant);
     }

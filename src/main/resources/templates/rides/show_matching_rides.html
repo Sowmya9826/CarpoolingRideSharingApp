@@ -57,13 +57,24 @@
                 <p class="card-text">
                     <strong>Starting from:</strong> <span th:text="${rideInfo.startAddress}">Pickup Address</span><br>
                     <strong>Destination:</strong> <span th:text="${rideInfo.endAddress}">Destination Address</span><br>
-                    <strong>Date:</strong> <span th:text="${rideInfo.date}">Ride Date</span><br>
+                    <strong>Available Seats:</strong> <span th:text="${rideInfo.availableSeats}">Available Seats</span><br>
+
+                    <strong>Schedule:</strong>
+                    <span th:if="${rideInfo.daysOfWeek != null and !#strings.isEmpty(rideInfo.daysOfWeek)}">
+                        <span th:each="day : ${rideInfo.daysOfWeekList}" class="badge bg-amethyst me-1">
+                            <span th:text="${day}">Day</span>
+                        </span>
+                    </span>
+                    <span th:if="${rideInfo.daysOfWeek == null or #strings.isEmpty(rideInfo.daysOfWeek)}">
+                        <span th:text="${rideInfo.date}">Ride Date</span>
+                    </span>
+                    <br>
+
                     <strong>Start Time:</strong> <span th:text="${rideInfo.startTime}">Ride Time</span><br>
                     <strong>End Time:</strong> <span th:text="${rideInfo.endTime}">Ride Time</span><br>
-                    <strong>Available Seats:</strong> <span th:text="${rideInfo.availableSeats}">Available Seats</span><br>
-                    <a th:href="@{'/rides/' + ${rideInfo.rideId}}" class="btn btn-primary mt-2">View</a>
 
                 <form th:action="@{'/rides/' + ${rideInfo.rideId} + '/join'}" method="post" style="display: inline;">
+                    <a th:href="@{'/rides/' + ${rideInfo.rideId}}" class="btn btn-primary mt-2">View</a>
                     <button type="submit" class="btn btn-primary mt-2">Join Ride</button>
                 </form>
                 </p>

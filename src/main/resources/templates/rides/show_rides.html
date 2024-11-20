@@ -42,7 +42,7 @@
 
 
 
-<!-- <!-- Main Content --> 
+<!-- Main Content -->
 <!-- >>>>>>> main -->
 <div class="container mt-5">
   <h1 class="text-center">Your Rides</h1>
@@ -81,9 +81,9 @@
             <strong>Destination:</strong> <span th:text="${rideInfo.destinationLocation.address}">Destination Address</span><br>
             <strong>Date:</strong> <span th:text="${rideInfo.date}">Ride Date</span><br>
             <strong>Start Time:</strong> <span th:text="${rideInfo.startTime}">Ride Time</span><br>
-            <a th:href="@{'/rides/' + ${rideInfo.rideId}}" class="btn btn-primary mt-2">View</a>
 
             <form th:action="@{'/rides/' + ${rideInfo.rideId} + '/cancel'}" method="post" style="display: inline;">
+              <a th:href="@{'/rides/' + ${rideInfo.rideId}}" class="btn btn-primary mt-2">View</a>
               <button type="submit" class="btn btn-primary mt-2">Cancel</button>
             </form>
           </p>
@@ -92,16 +92,25 @@
     </div>
 
     <!-- Recurring Rides -->
-    <div class="tab-pane fade show active" id="recurring" role="tabpanel" aria-labelledby="recurring-tab">
+    <div class="tab-pane fade" id="recurring" role="tabpanel" aria-labelledby="recurring-tab">
       <div th:each="rideInfo : ${recurringRides}" class="card mb-3">
         <div class="card-body">
           <p class="card-text">
             <strong>Starting from:</strong> <span th:text="${rideInfo.pickupLocation.address}">Pickup Address</span><br>
             <strong>Destination:</strong> <span th:text="${rideInfo.destinationLocation.address}">Destination Address</span><br>
-            <strong>Date:</strong> <span th:text="${rideInfo.date}">Ride Date</span><br>
+
+            <span th:each="day : ${rideInfo.daysOfWeekList}" class="badge bg-amethyst me-1">
+              <span th:text="${day}">Day</span>
+            </span>
+            <br>
+
             <strong>Start Time:</strong> <span th:text="${rideInfo.startTime}">Ride Time</span><br>
-            <a th:href="@{'/rides/' + ${rideInfo.rideId}}" class="btn btn-primary mt-2">View</a>
-            <a th:href="@{'/rides/' + ${rideInfo.rideId} + '/cancel'}" class="btn btn-primary mt-2">Cancel</a>
+            <strong>End Time:</strong> <span th:text="${rideInfo.endTime}">Ride Time</span><br>
+
+            <form th:action="@{'/rides/' + ${rideInfo.rideId} + '/cancel'}" method="post" style="display: inline;">
+              <a th:href="@{'/rides/' + ${rideInfo.rideId}}" class="btn btn-primary mt-2">View</a>
+              <button type="submit" class="btn btn-primary mt-2">Cancel</button>
+            </form>
           </p>
         </div>
       </div>
@@ -109,20 +118,14 @@
 
     <!-- Past Rides -->
     <div class="tab-pane fade" id="past" role="tabpanel" aria-labelledby="past-tab">
-      <form action="/rides/past" method="get" class="mb-3">
-        <label for="month" class="form-label">Select Month:</label>
-        <input type="month" id="month" name="month" class="form-control" required>
-        <button type="submit" class="btn btn-primary mt-2">Search</button>
-      </form>
-
-      <div th:each="ride : ${pastRides}" class="card mb-3">
+      <div th:each="rideInfo : ${pastRides}" class="card mb-3">
         <div class="card-body">
-          <h5 class="card-title" th:text="${ride.vehicle.name}">Vehicle Name</h5>
           <p class="card-text">
-            <strong>Start:</strong> <span th:text="${ride.pickupLocation.address}">Pickup Address</span><br>
-            <strong>Destination:</strong> <span th:text="${ride.destinationLocation.address}">Destination Address</span><br>
-            <strong>Date:</strong> <span th:text="${ride.date}">Ride Date</span><br>
-            <strong>Time:</strong> <span th:text="${ride.time}">Ride Time</span>
+            <strong>Starting from:</strong> <span th:text="${rideInfo.pickupLocation.address}">Pickup Address</span><br>
+            <strong>Destination:</strong> <span th:text="${rideInfo.destinationLocation.address}">Destination Address</span><br>
+            <strong>Date:</strong> <span th:text="${rideInfo.date}">Ride Date</span><br>
+            <strong>Start Time:</strong> <span th:text="${rideInfo.startTime}">Ride Time</span><br>
+            <a th:href="@{'/rides/' + ${rideInfo.rideId}}" class="btn btn-primary mt-2">View</a>
           </p>
         </div>
       </div>
