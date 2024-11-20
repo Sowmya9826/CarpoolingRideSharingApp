@@ -20,6 +20,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -70,7 +71,28 @@ public class RideController {
                 RideParticipantStatus.ACTIVE
         );
 
+        List<UserRideInfoDto> recurringRides = rideParticipantRepository.findRecurringRidesForUser(
+                userId,
+                RideParticipantStatus.ACTIVE
+        );
+
+        // Preprocess the daysOfWeek into a list
+        for (UserRideInfoDto rideInfo : recurringRides) {
+            if (rideInfo.getDaysOfWeek() != null && !rideInfo.getDaysOfWeek().isEmpty()) {
+                rideInfo.setDaysOfWeekList(Arrays.asList(rideInfo.getDaysOfWeek().split(",")));
+            }
+        }
+
+        List<UserRideInfoDto> pastRides = rideParticipantRepository.findPastRidesForUser(
+                userId,
+                LocalDateTime.now(ZoneId.of("UTC")).toLocalDate(),
+                LocalDateTime.now(ZoneId.of("UTC")).toLocalTime(),
+                RideParticipantStatus.ACTIVE
+        );
+
         model.addAttribute("upcomingRides", upcomingRides);
+        model.addAttribute("recurringRides", recurringRides);
+        model.addAttribute("pastRides", pastRides);
 
         return "rides/show_rides";
     }
@@ -202,6 +224,7 @@ public class RideController {
 
         List<MatchingRideDto> matchingRides = rideService.findMatchingRidesByEndTimeAndProximity(
                 userId,
+                findRideDto.isRecurring(),
                 findRideDto.getDate(),
                 findRideDto.getEndTime(),
                 findRideDto.getStartLatitude(),
@@ -210,6 +233,13 @@ public class RideController {
                 findRideDto.getEndLongitude(),
                 2.0
         );
+
+        // Preprocess the daysOfWeek into a list
+        for (MatchingRideDto rideInfo : matchingRides) {
+            if (rideInfo.getDaysOfWeek() != null && !rideInfo.getDaysOfWeek().isEmpty()) {
+                rideInfo.setDaysOfWeekList(Arrays.asList(rideInfo.getDaysOfWeek().split(",")));
+            }
+        }
 
         model.addAttribute("matchingRides", matchingRides);
 

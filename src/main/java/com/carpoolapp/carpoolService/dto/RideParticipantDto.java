@@ -1,7 +1,6 @@
 package com.carpoolapp.carpoolService.dto;
 
 import com.carpoolapp.carpoolService.models.enums.RideParticipateRole;
-import jakarta.persistence.Lob;
 import lombok.Data;
 
 @Data

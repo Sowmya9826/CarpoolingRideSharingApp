@@ -3,8 +3,6 @@ package com.carpoolapp.carpoolService.service;
 import com.carpoolapp.carpoolService.dto.MatchingRideDto;
 import com.carpoolapp.carpoolService.dto.RideDto;
 import com.carpoolapp.carpoolService.models.*;
-import com.carpoolapp.carpoolService.models.enums.RideParticipantStatus;
-import com.carpoolapp.carpoolService.models.enums.RideParticipateRole;
 import com.carpoolapp.carpoolService.models.enums.RideStatus;
 import com.carpoolapp.carpoolService.models.enums.RideType;
 import com.carpoolapp.carpoolService.respository.LocationRepository;
@@ -98,14 +96,15 @@ public class RideService {
     }
 
 
-    public List<MatchingRideDto> findMatchingRidesByEndTimeAndProximity(Long userId, LocalDate date, LocalTime userEndTime,
+    public List<MatchingRideDto> findMatchingRidesByEndTimeAndProximity(Long userId, boolean isRecurring, LocalDate date, LocalTime userEndTime,
                                                              double userStartLat, double userStartLon,
                                                              double userEndLat, double userEndLon,
                                                              double proximityThresholdKm) {
         // Fetch rides based on end time, status, and seat availability
         LocalTime endTimeMinus = userEndTime.minusMinutes(15);
         LocalTime endTimePlus = userEndTime.plusMinutes(15);
-        List<MatchingRideDto> matchingRideDtos = rideRepository.findRidesWithLocationsExcludingUser(date, endTimeMinus, endTimePlus, userId);
+        List<MatchingRideDto> matchingRideDtos = isRecurring ? rideRepository.findOneTimeRidesWithLocationsExcludingUser(date, endTimeMinus, endTimePlus, userId) :
+                rideRepository.findRecurringRidesWithLocationsExcludingUser(endTimeMinus, endTimePlus, userId);
 
         // Filter rides further by proximity
         return matchingRideDtos.stream()

@@ -5,11 +5,13 @@ import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Data
 public class MatchingRideDto {
     private Long rideId;
     private LocalDate date;
+    private String daysOfWeek;
     private LocalTime startTime;
     private LocalTime endTime;
     private RideStatus status;
@@ -21,9 +23,12 @@ public class MatchingRideDto {
     private double endLatitude;
     private double endLongitude;
 
-    public MatchingRideDto(Long rideId, LocalDate date, LocalTime startTime, LocalTime endTime, RideStatus status, int availableSeats, String startAddress, double startLatitude, double startLongitude, String endAddress, double endLatitude, double endLongitude) {
+    private List<String> daysOfWeekList;
+
+    public MatchingRideDto(Long rideId, LocalDate date, String daysOfWeek, LocalTime startTime, LocalTime endTime, RideStatus status, int availableSeats, String startAddress, double startLatitude, double startLongitude, String endAddress, double endLatitude, double endLongitude) {
         this.rideId = rideId;
         this.date = date;
+        this.daysOfWeek = daysOfWeek;
         this.startTime = startTime;
         this.endTime = endTime;
         this.status = status;

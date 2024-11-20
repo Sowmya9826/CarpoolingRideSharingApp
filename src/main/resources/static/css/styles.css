@@ -82,6 +82,11 @@ button.maps-loc-select {
     color: #8a2be2; /* Slightly lighter white for hover effect */
 }
 
+.bg-amethyst {
+    background-color: #9966cc; /* Amethyst */
+    color: white;
+}
+
 .btn-primary {
     background-color: #9966cc !important; /* Amethyst */
     border-color: #9966cc !important; /* Amethyst border */

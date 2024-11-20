@@ -28,7 +28,20 @@
     .navbar-pastel .navbar-brand {
       color: #ffffff;
     }
+    .hidden {
+      display: none;
+    }
   </style>
+    <script>
+    function toggleRideTypeFields() {
+      const rideType = document.querySelector('input[name="isRecurring"]:checked').value;
+      if (rideType === "true") {
+        document.getElementById("dateField").classList.add("hidden");
+      } else {
+        document.getElementById("dateField").classList.remove("hidden");
+      }
+    }
+  </script>
 
 </head>
 <body>
@@ -77,7 +90,20 @@
             <input type="hidden" id="endLongitude" name="endLongitude">
         </div>
 
+        <!-- Ride Type -->
         <div class="mb-3">
+            <label class="form-label"></label><br>
+            <div class="form-check form-check-inline">
+                <input type="radio" id="oneTime" name="isRecurring" class="form-check-input" value="false" checked onclick="toggleRideTypeFields()">
+                <label for="oneTime" class="form-check-label">One-Time</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input type="radio" id="recurring" name="isRecurring" class="form-check-input" value="true" onclick="toggleRideTypeFields()">
+                <label for="recurring" class="form-check-label">Recurring</label>
+            </div>
+        </div>
+
+        <div id="dateField" class="mb-3">
             <label for="date" class="form-label">Ride Date:</label>
             <input type="date" id="date" name="date" class="form-control"><br>
         </div>
