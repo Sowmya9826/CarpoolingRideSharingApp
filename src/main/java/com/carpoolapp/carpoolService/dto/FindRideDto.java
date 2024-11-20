@@ -14,4 +14,5 @@ public class FindRideDto {
     private LocalDate date;
     private LocalTime endTime;
     private boolean isRecurring;
+
 }

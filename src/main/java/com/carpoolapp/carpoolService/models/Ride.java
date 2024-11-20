@@ -35,6 +35,12 @@ public class Ride {
     @JoinColumn(name = "destinationLocationId")
     private Location destinationLocation;
 
+    private double startLatitude;
+    private double startLongitude;
+    private double endLatitude;
+    private double endLongitude;
+
+
     private LocalTime startTime;
     private LocalTime endTime;
     private LocalDate date;

@@ -72,6 +72,8 @@
 
                     <strong>Start Time:</strong> <span th:text="${rideInfo.startTime}">Ride Time</span><br>
                     <strong>End Time:</strong> <span th:text="${rideInfo.endTime}">Ride Time</span><br>
+                    <strong> Estimated Fare:</strong> <span th:text="${rideInfo.estimatedFare}"> </span>
+
 
                 <form th:action="@{'/rides/' + ${rideInfo.rideId} + '/join'}" method="post" style="display: inline;">
                     <a th:href="@{'/rides/' + ${rideInfo.rideId}}" class="btn btn-primary mt-2">View</a>
