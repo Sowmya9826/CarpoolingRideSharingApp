@@ -255,6 +255,12 @@ public class RideController {
             }
         }
 
+        // Add the estimated fare to the matching rides
+        for (MatchingRideDto ride : matchingRides) {
+            // round the fare to 2 decimal places
+            ride.setEstimatedFare(Math.round(fareService.getEstimatedFare(ride.getRideId()) * 100.0) / 100.0);
+        }
+
         model.addAttribute("matchingRides", matchingRides);
 
         return "rides/show_matching_rides";
