@@ -103,8 +103,7 @@ public class RideService {
         // Fetch rides based on end time, status, and seat availability
         LocalTime endTimeMinus = userEndTime.minusMinutes(15);
         LocalTime endTimePlus = userEndTime.plusMinutes(15);
-        List<MatchingRideDto> matchingRideDtos = isRecurring ? rideRepository.findOneTimeRidesWithLocationsExcludingUser(date, endTimeMinus, endTimePlus, userId) :
-                rideRepository.findRecurringRidesWithLocationsExcludingUser(endTimeMinus, endTimePlus, userId);
+        List<MatchingRideDto> matchingRideDtos = isRecurring ? rideRepository.findRecurringRidesWithLocationsExcludingUser(endTimeMinus, endTimePlus, userId) : rideRepository.findOneTimeRidesWithLocationsExcludingUser(date, endTimeMinus, endTimePlus, userId);
 
         // Filter rides further by proximity
         return matchingRideDtos.stream()

@@ -2,15 +2,9 @@ package com.carpoolapp.carpoolService.controller;
 
 import com.carpoolapp.carpoolService.dto.*;
 import com.carpoolapp.carpoolService.models.*;
-import com.carpoolapp.carpoolService.models.enums.RideParticipantStatus;
-import com.carpoolapp.carpoolService.models.enums.RideParticipateRole;
-import com.carpoolapp.carpoolService.models.enums.RideStatus;
-import com.carpoolapp.carpoolService.models.enums.RideType;
+import com.carpoolapp.carpoolService.models.enums.*;
 import com.carpoolapp.carpoolService.respository.*;
-import com.carpoolapp.carpoolService.service.LocationService;
-import com.carpoolapp.carpoolService.service.RideParticipantService;
-import com.carpoolapp.carpoolService.service.RideService;
-import com.carpoolapp.carpoolService.service.UserService;
+import com.carpoolapp.carpoolService.service.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -49,6 +43,12 @@ public class RideController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private FareService fareService;
+
+    @Autowired
+    private TransactionService transactionService;
 
     @Autowired
     private RideParticipantService rideParticipantService;
@@ -165,6 +165,8 @@ public class RideController {
         User driver = vehicleOptional.get().getOwner();
         rideParticipantService.createRideParticipantAsDriver(createdRide, driver);
 
+        // create a fare object for the ride
+        fareService.createFare(createdRide);
 
         redirectAttributes.addFlashAttribute("message", "Ride created successfully!");
 
@@ -190,12 +192,24 @@ public class RideController {
             ride.setStatus(RideStatus.CANCELLED);
             rideRepository.save(ride);
             rideParticipantService.markRideParticipantsAsCancelled(ride);
+
+            // delete all the transactions
+            transactionService.deleteTransactionsForRide(ride);
+
+            // delete the fare
+            fareService.deleteFareForRide(ride);
         } else {
             rideParticipantService.markRideParticipantAsCancelled(ride, userId);
 
             // increase the available seats in the ride
             ride.setAvailableSeats(ride.getAvailableSeats() + 1);
             rideRepository.save(ride);
+
+            // delete the transaction for the user
+            transactionService.deleteTransactionForUserInRide(userId, ride);
+
+            // update the transaction amount for all the passengers
+            transactionService.updateTransactionAmountOfPassengers(ride);
         }
 
         redirectAttributes.addFlashAttribute("message", "Ride cancelled successfully!");
@@ -268,6 +282,12 @@ public class RideController {
         // decrease the available seats in the ride
         ride.setAvailableSeats(ride.getAvailableSeats() - 1);
         rideRepository.save(ride);
+
+        // create a transaction for the new passenger
+        transactionService.createTransactionForPassenger(ride, passenger, TransactionType.CREDIT, "Ride fare");
+
+        // update the transaction amount for all the passengers
+        transactionService.updateTransactionAmountOfPassengers(ride);
 
         redirectAttributes.addFlashAttribute("message", "Joined the ride successfully!");
 

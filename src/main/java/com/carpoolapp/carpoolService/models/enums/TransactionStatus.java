@@ -1,6 +1,6 @@
 package com.carpoolapp.carpoolService.models.enums;
 
-public enum FareStatus {
+public enum TransactionStatus {
     PENDING,
     COMPLETED
 }
