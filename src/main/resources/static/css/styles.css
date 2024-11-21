@@ -141,3 +141,11 @@ button.maps-loc-select {
 .bg-red {
     background-color: #dc3545;
 }
+
+.bg-green {
+    background-color: #28a745;
+}
+
+.badge {
+    margin-left: 1em;
+}

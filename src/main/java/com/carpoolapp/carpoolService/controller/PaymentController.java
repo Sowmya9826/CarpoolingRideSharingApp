@@ -2,6 +2,7 @@ package com.carpoolapp.carpoolService.controller;
 
 import com.carpoolapp.carpoolService.dto.PaymentSummaryDto;
 import com.carpoolapp.carpoolService.dto.RideOwedDto;
+import com.carpoolapp.carpoolService.dto.RideOwedToUserDto;
 import com.carpoolapp.carpoolService.respository.TransactionRepository;
 import com.carpoolapp.carpoolService.service.TransactionService;
 import jakarta.servlet.http.HttpSession;
@@ -62,7 +63,26 @@ public class PaymentController {
 
         model.addAttribute("rides", rides);
 
-        return "payment_pages/rides-owed";
+        return "payment_pages/rides_owed";
+    }
+
+
+    @GetMapping("/rides-owed-to-user")
+    public String showRidesOwedToUser(HttpSession session, Model model) {
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/auth/login";
+        }
+
+        List<RideOwedToUserDto> ridesOwedToUser = transactionRepository.findRidesOwedToUser(userId, LocalDateTime.now(ZoneId.of("UTC")).toLocalDate(),
+                LocalDateTime.now(ZoneId.of("UTC")).toLocalTime());
+
+        // round the amount to 2 decimal places
+        ridesOwedToUser.forEach(ride -> ride.setTotalAmountOwed(Math.round(ride.getTotalAmountOwed() * 100.0) / 100.0));
+
+        model.addAttribute("ridesOwedToUser", ridesOwedToUser);
+
+        return "payment_pages/rides_owed_to_user";
     }
 
 }

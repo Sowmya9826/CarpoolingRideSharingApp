@@ -1,5 +1,6 @@
 package com.carpoolapp.carpoolService.respository;
 
+import com.carpoolapp.carpoolService.dto.RideOwedToUserDto;
 import com.carpoolapp.carpoolService.models.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -45,4 +46,19 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     List<Transaction> findTransactionsOwedByUser(@Param("userId") Long userId,
                                                  @Param("currentDate") LocalDate currentDate,
                                                  @Param("currentTime") LocalTime currentTime);
+
+    @Query("SELECT new com.carpoolapp.carpoolService.dto.RideOwedToUserDto(r.id, r.pickupLocation.address, r.destinationLocation.address, " +
+            "r.date, SUM(t.amount)) " +
+            "FROM Transaction t " +
+            "JOIN t.fare.ride r " +
+            "JOIN RideParticipant rp ON rp.ride.id = r.id " +
+            "WHERE rp.participant.id = :userId " +
+            "AND rp.role = com.carpoolapp.carpoolService.models.enums.RideParticipateRole.DRIVER " +
+            "AND (r.date < :currentDate " +
+            "OR (r.date = :currentDate AND r.endTime < :currentTime)) " +
+            "AND t.status = com.carpoolapp.carpoolService.models.enums.TransactionStatus.PENDING " +
+            "GROUP BY r.id, r.pickupLocation.address, r.destinationLocation.address, r.startTime, r.endTime, r.date")
+    List<RideOwedToUserDto> findRidesOwedToUser(@Param("userId") Long userId,
+                                                @Param("currentDate") LocalDate currentDate,
+                                                @Param("currentTime") LocalTime currentTime);
 }
