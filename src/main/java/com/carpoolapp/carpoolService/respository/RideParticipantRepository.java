@@ -62,4 +62,9 @@ public interface RideParticipantRepository extends JpaRepository<RideParticipant
     List<RideParticipantDto> getActiveRidePassengersDetails(Long rideId);
 
     Optional<RideParticipant> findByRideIdAndParticipantId(Long id, Long userId);
+
+    @Query("SELECT COUNT(rp) FROM RideParticipant rp WHERE rp.ride.id = :rideId " +
+            "AND rp.status = com.carpoolapp.carpoolService.models.enums.RideParticipantStatus.ACTIVE " +
+            "AND rp.role = com.carpoolapp.carpoolService.models.enums.RideParticipateRole.PASSENGER")
+    int countActivePassengersInRide(Long rideId);
 }

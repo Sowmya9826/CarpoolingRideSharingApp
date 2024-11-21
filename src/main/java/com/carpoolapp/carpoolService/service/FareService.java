@@ -1,13 +1,50 @@
 package com.carpoolapp.carpoolService.service;
 
 
+import com.carpoolapp.carpoolService.models.Fare;
+import com.carpoolapp.carpoolService.models.Ride;
+import com.carpoolapp.carpoolService.respository.FareRepository;
+import com.carpoolapp.carpoolService.respository.RideParticipantRepository;
+import com.carpoolapp.carpoolService.respository.RideRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Optional;
 
 @Service
 public class FareService {
 
+    @Autowired
+    private FareRepository fareRepository;
+
+    @Autowired
+    private RideRepository rideRepository;
+
+    @Autowired
+    private RideParticipantRepository rideParticipantRepository;
+
     private static final double FARE_PER_KM = 1.0;  // Set fare per kilometer (or any other currency unit)
+
+    public void createFare(Ride ride) {
+        Fare fare = new Fare();
+        double amount = calculateFare(ride.getPickupLocation().getLatitude(), ride.getPickupLocation().getLongitude(),
+                ride.getDestinationLocation().getLatitude(), ride.getDestinationLocation().getLongitude());
+        fare.setAmount(amount);
+        fare.setRide(ride);
+        fareRepository.save(fare);
+    }
+
+    public double calculatePerPassengerFare(Ride ride, int passengerCount) {
+        Optional<Fare> fareOptional = fareRepository.findByRideId(ride.getId());
+        if (fareOptional.isEmpty()) {
+            throw new RuntimeException("Fare not found for the ride");
+        }
+
+        double totalFare = fareOptional.get().getAmount();
+
+        return (passengerCount > 0) ? totalFare / passengerCount : totalFare;
+    }
 
     /**
      * Calculates the fare between the start and destination coordinates using the Haversine formula.
@@ -20,6 +57,21 @@ public class FareService {
     public double calculateFare(double startLat, double startLng, double endLat, double endLng) {
         double distance = calculateDistance(startLat, startLng, endLat, endLng);
         return distance * FARE_PER_KM;  // Multiply by the rate per km
+    }
+
+    public double getEstimatedFare(Long rideId) {
+        Fare fare = fareRepository.findByRideId(rideId)
+                .orElseThrow(() -> new RuntimeException("Fare not found for the ride"));
+
+        int passengerCount = rideParticipantRepository.countActivePassengersInRide(rideId) + 1;  // Add the passenger looking for a ride
+
+        return (fare.getAmount() / passengerCount);
+    }
+
+    public void deleteFareForRide(Ride ride) {
+        Fare fare = fareRepository.findByRideId(ride.getId())
+                .orElseThrow(() -> new RuntimeException("Fare not found for the ride"));
+        fareRepository.delete(fare);
     }
 
     /**

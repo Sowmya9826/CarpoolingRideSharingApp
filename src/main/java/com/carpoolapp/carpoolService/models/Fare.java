@@ -1,6 +1,5 @@
 package com.carpoolapp.carpoolService.models;
 
-import com.carpoolapp.carpoolService.models.enums.FareStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -17,5 +16,4 @@ public class Fare {
     private Ride ride;
 
     private double amount;
-    private FareStatus status;
 }

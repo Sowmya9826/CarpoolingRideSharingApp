@@ -25,6 +25,8 @@ public class MatchingRideDto {
 
     private List<String> daysOfWeekList;
 
+    private double estimatedFare;
+
     public MatchingRideDto(Long rideId, LocalDate date, String daysOfWeek, LocalTime startTime, LocalTime endTime, RideStatus status, int availableSeats, String startAddress, double startLatitude, double startLongitude, String endAddress, double endLatitude, double endLongitude) {
         this.rideId = rideId;
         this.date = date;
