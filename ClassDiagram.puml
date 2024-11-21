@@ -1,0 +1,83 @@
+@startuml Carpool System
+
+skinparam classAttributeIconSize 0
+
+class User {
+  -id: Long
+  -firstName: String
+  -LastName: String
+  -emailId: String
+  -phoneNumber: String
+  -password: String
+  -dob: Date
+  +createUser()
+  +updateProfile()
+}
+
+class Vehicle {
+  -id: Long
+  -owner: User
+  -number: String
+  -type: String
+  -name: String
+  -color: String
+  -seatCount: int
+  +createVehicle()
+}
+
+class Ride {
+  -id: Long
+  -vehicle: Vehicle
+  -location: pickUpLocation
+  -status: RideStatus
+  -type: RideType
+  -destinationLocation: Location
+  -startTime: LocalTime
+  -endTime: LocalTime
+  -date: LocalDate
+  -daysOfWeek: String
+  -availableSeats: int
+  -createDate: LocalDate
+  +createRide()
+  +findRides()
+  +cancelRide()
+}
+
+class RideParticipant {
+  -id: Long
+  -ride: Ride
+  -participant: User
+  -role: RideParticipantRole
+  -status: RideParticipantStatus
+  -joinedAt: LocalDate
+  -cancelledAt: LocalDate
+  +joinRide()
+  +cancelRide()
+}
+class Location {
+  -id: Long
+  -latitude: double
+  -longitude: double
+  -address: String
+  +createLocation()
+}
+class Fare{
+  -id: Long
+  -ride: Ride
+  -amount: double
+  -status: FareStatus
+  +createFare()
+  +updateFare()
+  +deleteFare()
+}
+
+
+User "1" -- "0.*" Vehicle : owns
+User "0.*" -- "0.*" Ride : participates in <
+Ride "1" -- "1.*" RideParticipant : has
+Ride "1" -- "1" Fare : has
+Ride "1" -- "2" Location : has
+
+
+
+@enduml
