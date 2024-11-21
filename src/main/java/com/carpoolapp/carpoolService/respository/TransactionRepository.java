@@ -61,4 +61,21 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     List<RideOwedToUserDto> findRidesOwedToUser(@Param("userId") Long userId,
                                                 @Param("currentDate") LocalDate currentDate,
                                                 @Param("currentTime") LocalTime currentTime);
+
+    @Query("SELECT t FROM Transaction t " +
+            "JOIN t.fare.ride r " +
+            "WHERE t.user.id = :userId " +
+            "AND t.status = com.carpoolapp.carpoolService.models.enums.TransactionStatus.PENDING " +
+            "AND (r.date < :currentDate " +
+            "OR (r.date = :currentDate AND r.endTime < :currentTime))")
+    List<Transaction> findPendingTransactionsForPastRides(@Param("userId") Long userId,
+                                                          @Param("currentDate") LocalDate currentDate,
+                                                          @Param("currentTime") LocalTime currentTime);
+
+    @Query("SELECT t FROM Transaction t " +
+            "WHERE t.user.id = :userId " +
+            "AND t.fare.ride.id = :rideId " +
+            "AND t.status = com.carpoolapp.carpoolService.models.enums.TransactionStatus.PENDING")
+    List<Transaction> findPendingTransactionsByUserAndRide(@Param("userId") Long userId,
+                                                           @Param("rideId") Long rideId);
 }

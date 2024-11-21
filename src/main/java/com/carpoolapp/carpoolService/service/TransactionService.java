@@ -102,4 +102,43 @@ public class TransactionService {
             );
         }).collect(Collectors.toList());
     }
+
+    public void payAllOwedByUser(Long userId) {
+        LocalDate currentDate = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
+
+        // Fetch all pending transactions for past rides
+        List<Transaction> pendingTransactions = transactionRepository.findPendingTransactionsForPastRides(userId, currentDate, currentTime);
+
+        if (pendingTransactions.isEmpty()) {
+            return;
+        }
+
+        // Update each transaction's status to COMPLETED
+        for (Transaction transaction : pendingTransactions) {
+            transaction.setStatus(TransactionStatus.COMPLETED);
+            transaction.setCompletedDate(LocalDate.now());
+        }
+
+        transactionRepository.saveAll(pendingTransactions);
+    }
+
+    public void payForRide(Long userId, Long rideId) {
+        // Fetch pending transactions for the user and ride
+        List<Transaction> pendingTransactions = transactionRepository.findPendingTransactionsByUserAndRide(userId, rideId);
+
+        if (pendingTransactions.isEmpty()) {
+            // No transactions to process
+            return;
+        }
+
+        // Update transaction statuses to COMPLETED
+        for (Transaction transaction : pendingTransactions) {
+            transaction.setStatus(TransactionStatus.COMPLETED);
+            transaction.setCompletedDate(LocalDate.now()); // Optional: Set the completion date
+        }
+
+        // Save updated transactions
+        transactionRepository.saveAll(pendingTransactions);
+    }
 }

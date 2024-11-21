@@ -17,6 +17,9 @@
 <!-- Payment Summary -->
 <div class="container mt-5">
   <h1 class="text-center">Payment Summary</h1>
+  <div th:if="${successMessage}" class="alert alert-success text-center">
+    <p th:text="${successMessage}"></p>
+  </div>
   <div class="row mt-4">
     <div class="col-md-6">
       <div class="card alert-warning">
@@ -26,6 +29,14 @@
         </div>
       </div>
       <a th:href="@{/payments/rides-owed}" class="btn btn-primary mt-3">View Rides You Owe</a>
+      <div class="mt-4">
+        <form th:action="@{/payments/pay-all-owed}" method="post">
+          <!-- Button when there is an amount owed -->
+          <form th:action="@{/payments/pay-all-owed}" method="post">
+            <button type="submit" class="btn btn-primary">Pay All </button>
+          </form>
+        </form>
+      </div>
     </div>
     <div class="col-md-6">
       <div class="card alert-success">

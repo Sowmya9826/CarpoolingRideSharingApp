@@ -48,6 +48,9 @@
         <div class="amount-owed">
           You owe <span th:text="'$' + ${ride.amountOwed}" class="badge bg-red me-2">0.00</span>
         </div>
+        <form th:action="@{'/payments/' + ${ride.id} + '/pay'}" method="post">
+          <button type="submit" class="btn btn-primary">Pay for Ride</button>
+        </form>
       </div>
     </div>
   </div>

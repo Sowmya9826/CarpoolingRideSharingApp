@@ -149,3 +149,9 @@ button.maps-loc-select {
 .badge {
     margin-left: 1em;
 }
+
+.blurred-effect.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+}
