@@ -5,6 +5,7 @@ import com.carpoolapp.carpoolService.models.*;
 import com.carpoolapp.carpoolService.models.enums.*;
 import com.carpoolapp.carpoolService.respository.*;
 import com.carpoolapp.carpoolService.service.*;
+import com.carpoolapp.carpoolService.util.DistanceCalculator;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Arrays;
@@ -145,8 +147,33 @@ public class RideController {
     }
 
 
+
     @PostMapping("/create")
     public String createRide(RideDto rideDto, HttpSession session, RedirectAttributes redirectAttributes) {
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/auth/login";
+        }
+
+        // Check if the ride date is in the past
+        if (rideDto.getDate() != null && rideDto.getDate().isBefore(LocalDate.now())) {
+            redirectAttributes.addFlashAttribute("message", "Cannot book a ride for a past date");
+            return "redirect:/rides/create";
+        }
+
+        // Calculate the distance between start and end locations
+        double distance = DistanceCalculator.calculateDistance(
+                rideDto.getStartLatitude(), rideDto.getStartLongitude(),
+                rideDto.getEndLatitude(), rideDto.getEndLongitude()
+        );
+
+        // Check if the distance exceeds the maximum allowed range (e.g., 100 km)
+        final double MAX_DISTANCE = 100.0;
+        if (distance > MAX_DISTANCE) {
+            redirectAttributes.addFlashAttribute("message", "Cannot book a ride for such a long distance");
+            return "redirect:/rides/create";
+        }
+
         Long vehicleId = rideDto.getVehicleId();
         Optional<Vehicle> vehicleOptional = vehicleRepository.findById(vehicleId);
         if (vehicleOptional.isEmpty()) {
@@ -161,11 +188,11 @@ public class RideController {
         // Create the ride
         Ride createdRide = rideService.createRide(rideDto, vehicleOptional.get(), startLocation, endLocation);
 
-        // create a ride participant for the driver
+        // Create a ride participant for the driver
         User driver = vehicleOptional.get().getOwner();
         rideParticipantService.createRideParticipantAsDriver(createdRide, driver);
 
-        // create a fare object for the ride
+        // Create a fare object for the ride
         fareService.createFare(createdRide);
 
         redirectAttributes.addFlashAttribute("message", "Ride created successfully!");
