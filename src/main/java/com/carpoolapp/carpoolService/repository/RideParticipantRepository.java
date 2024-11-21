@@ -1,4 +1,4 @@
-package com.carpoolapp.carpoolService.respository;
+package com.carpoolapp.carpoolService.repository;
 
 import com.carpoolapp.carpoolService.dto.RideParticipantDto;
 import com.carpoolapp.carpoolService.dto.UserRideInfoDto;

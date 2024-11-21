@@ -5,7 +5,7 @@ import com.carpoolapp.carpoolService.models.RideParticipant;
 import com.carpoolapp.carpoolService.models.User;
 import com.carpoolapp.carpoolService.models.enums.RideParticipantStatus;
 import com.carpoolapp.carpoolService.models.enums.RideParticipateRole;
-import com.carpoolapp.carpoolService.respository.RideParticipantRepository;
+import com.carpoolapp.carpoolService.repository.RideParticipantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

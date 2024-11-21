@@ -3,7 +3,7 @@ package com.carpoolapp.carpoolService.service;
 import com.carpoolapp.carpoolService.dto.RideParticipantDto;
 import com.carpoolapp.carpoolService.dto.UserDto;
 import com.carpoolapp.carpoolService.models.User;
-import com.carpoolapp.carpoolService.respository.UserRepository;
+import com.carpoolapp.carpoolService.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;

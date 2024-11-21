@@ -6,9 +6,9 @@ import com.carpoolapp.carpoolService.models.Transaction;
 import com.carpoolapp.carpoolService.models.User;
 import com.carpoolapp.carpoolService.models.enums.TransactionStatus;
 import com.carpoolapp.carpoolService.models.enums.TransactionType;
-import com.carpoolapp.carpoolService.respository.FareRepository;
-import com.carpoolapp.carpoolService.respository.RideParticipantRepository;
-import com.carpoolapp.carpoolService.respository.TransactionRepository;
+import com.carpoolapp.carpoolService.repository.FareRepository;
+import com.carpoolapp.carpoolService.repository.RideParticipantRepository;
+import com.carpoolapp.carpoolService.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
