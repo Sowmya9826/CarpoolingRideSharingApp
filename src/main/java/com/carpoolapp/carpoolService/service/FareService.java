@@ -3,12 +3,11 @@ package com.carpoolapp.carpoolService.service;
 
 import com.carpoolapp.carpoolService.models.Fare;
 import com.carpoolapp.carpoolService.models.Ride;
-import com.carpoolapp.carpoolService.respository.FareRepository;
-import com.carpoolapp.carpoolService.respository.RideParticipantRepository;
-import com.carpoolapp.carpoolService.respository.RideRepository;
+import com.carpoolapp.carpoolService.repository.FareRepository;
+import com.carpoolapp.carpoolService.repository.RideParticipantRepository;
+import com.carpoolapp.carpoolService.repository.RideRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
 

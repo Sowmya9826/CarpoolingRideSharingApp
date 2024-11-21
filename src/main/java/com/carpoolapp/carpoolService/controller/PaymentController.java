@@ -3,7 +3,7 @@ package com.carpoolapp.carpoolService.controller;
 import com.carpoolapp.carpoolService.dto.PaymentSummaryDto;
 import com.carpoolapp.carpoolService.dto.RideOwedDto;
 import com.carpoolapp.carpoolService.dto.RideOwedToUserDto;
-import com.carpoolapp.carpoolService.respository.TransactionRepository;
+import com.carpoolapp.carpoolService.repository.TransactionRepository;
 import com.carpoolapp.carpoolService.service.TransactionService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.List;
 
