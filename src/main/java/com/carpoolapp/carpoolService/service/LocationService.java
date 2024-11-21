@@ -1,7 +1,7 @@
 package com.carpoolapp.carpoolService.service;
 
 import com.carpoolapp.carpoolService.models.Location;
-import com.carpoolapp.carpoolService.respository.LocationRepository;
+import com.carpoolapp.carpoolService.repository.LocationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

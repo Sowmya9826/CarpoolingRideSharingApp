@@ -2,7 +2,7 @@ package com.carpoolapp.carpoolService.controller;
 
 import com.carpoolapp.carpoolService.dto.UserDto;
 import com.carpoolapp.carpoolService.models.User;
-import com.carpoolapp.carpoolService.respository.UserRepository;
+import com.carpoolapp.carpoolService.repository.UserRepository;
 import com.carpoolapp.carpoolService.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -3,7 +3,7 @@ package com.carpoolapp.carpoolService.controller;
 import com.carpoolapp.carpoolService.dto.*;
 import com.carpoolapp.carpoolService.models.*;
 import com.carpoolapp.carpoolService.models.enums.*;
-import com.carpoolapp.carpoolService.respository.*;
+import com.carpoolapp.carpoolService.repository.*;
 import com.carpoolapp.carpoolService.service.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
