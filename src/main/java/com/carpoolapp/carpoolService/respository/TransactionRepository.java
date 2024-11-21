@@ -36,4 +36,13 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     Double findTotalOwedToUser(@Param("userId") Long userId,
                                @Param("currentDate") LocalDate currentDate,
                                @Param("currentTime") LocalTime currentTime);
+
+    @Query("SELECT t FROM Transaction t " +
+            "WHERE t.user.id = :userId " +
+            "AND t.status = com.carpoolapp.carpoolService.models.enums.TransactionStatus.PENDING " +
+            "AND (t.fare.ride.date < :currentDate " +
+            "OR (t.fare.ride.date = :currentDate AND t.fare.ride.endTime < :currentTime))")
+    List<Transaction> findTransactionsOwedByUser(@Param("userId") Long userId,
+                                                 @Param("currentDate") LocalDate currentDate,
+                                                 @Param("currentTime") LocalTime currentTime);
 }

@@ -1,5 +1,6 @@
 package com.carpoolapp.carpoolService.service;
 
+import com.carpoolapp.carpoolService.dto.RideOwedDto;
 import com.carpoolapp.carpoolService.models.Fare;
 import com.carpoolapp.carpoolService.models.Ride;
 import com.carpoolapp.carpoolService.models.Transaction;
@@ -11,6 +12,13 @@ import com.carpoolapp.carpoolService.respository.RideParticipantRepository;
 import com.carpoolapp.carpoolService.respository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TransactionService {
@@ -74,5 +82,24 @@ public class TransactionService {
                 .filter(transaction -> transaction.getUser().getId().equals(userId))
                 .findFirst()
                 .ifPresent(transactionRepository::delete);
+    }
+
+    public List<RideOwedDto> getRidesWhereUserOwes(Long userId) {
+        List<Transaction> transactions = transactionRepository.findTransactionsOwedByUser(userId, LocalDateTime.now(ZoneId.of("UTC")).toLocalDate(),
+                LocalDateTime.now(ZoneId.of("UTC")).toLocalTime());
+        return transactions.stream().map(t -> {
+            Ride ride = t.getFare().getRide();
+            User driver = ride.getVehicle().getOwner();
+            return new RideOwedDto(
+                    ride.getId(),
+                    ride.getPickupLocation().getAddress(),
+                    ride.getDestinationLocation().getAddress(),
+                    ride.getDate(),
+                    driver.getFirstName(),
+                    driver.getLastName(),
+                    driver.getPhoneNumber(),
+                    t.getAmount()
+            );
+        }).collect(Collectors.toList());
     }
 }

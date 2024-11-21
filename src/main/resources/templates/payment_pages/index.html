@@ -25,6 +25,7 @@
           <p class="card-text">$<span th:text="${paymentSummary.totalOwed}">0.00</span></p>
         </div>
       </div>
+      <a th:href="@{/payments/rides-owed}" class="btn btn-primary mt-3">View Rides You Owe</a>
     </div>
     <div class="col-md-6">
       <div class="card alert-success">

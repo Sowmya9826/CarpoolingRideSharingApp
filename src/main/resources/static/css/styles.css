@@ -137,3 +137,7 @@ button.maps-loc-select {
     background-color: #f8d7da;
     border-color: #badbcc;
 }
+
+.bg-red {
+    background-color: #dc3545;
+}
