@@ -82,7 +82,7 @@ public class FareService {
      * @param endLng    Longitude of the destination
      * @return          Distance in kilometers
      */
-    private double calculateDistance(double startLat, double startLng, double endLat, double endLng) {
+    public double calculateDistance(double startLat, double startLng, double endLat, double endLng) {
         final double EARTH_RADIUS_KM = 6371; // Earth radius in kilometers
         double latDistance = Math.toRadians(endLat - startLat);
         double lngDistance = Math.toRadians(endLng - startLng);

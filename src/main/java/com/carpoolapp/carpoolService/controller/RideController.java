@@ -5,7 +5,6 @@ import com.carpoolapp.carpoolService.models.*;
 import com.carpoolapp.carpoolService.models.enums.*;
 import com.carpoolapp.carpoolService.respository.*;
 import com.carpoolapp.carpoolService.service.*;
-import com.carpoolapp.carpoolService.util.DistanceCalculator;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -161,11 +160,14 @@ public class RideController {
             return "redirect:/rides/create";
         }
 
-        // Calculate the distance between start and end locations
-        double distance = DistanceCalculator.calculateDistance(
+
+
+        double distance = fareService.calculateDistance(
                 rideDto.getStartLatitude(), rideDto.getStartLongitude(),
                 rideDto.getEndLatitude(), rideDto.getEndLongitude()
         );
+
+
 
         // Check if the distance exceeds the maximum allowed range (e.g., 100 km)
         final double MAX_DISTANCE = 100.0;
