@@ -139,17 +139,25 @@
 <!--      <label for="date" class="form-label">Ride Date:</label>-->
 <!--      <input type="date" id="date" name="date" class="form-control"><br>-->
 <!--    </div>-->
-    <div id="oneTimeFields" class="mb-3">
-      <label for="date" class="form-label">Ride Date:</label>
-      <input type="date" id="date" name="date" class="form-control" min="">
-    </div>
+      <div id="oneTimeFields" class="mb-3">
+        <label for="date" class="form-label">Ride Date:</label>
+        <input type="date" id="date" name="date" class="form-control" min="">
+      </div>
 
-    <script>
-      // Set min date to today
-      const dateInput = document.getElementById('date');
-      const today = new Date().toISOString().split('T')[0];
-      dateInput.min = today;
-    </script>
+      <script>
+        // Get the date input element
+        const dateInput = document.getElementById('date');
+
+        // Get yesterday's date
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        // Format as YYYY-MM-DD
+        const minDate = yesterday.toISOString().split('T')[0];
+
+        // Set minimum date to yesterday
+        dateInput.min = minDate;
+      </script>
 
     <!-- Recurring Ride Fields -->
     <div id="recurringFields" class="mb-3 hidden">
@@ -185,9 +193,42 @@
       </div>
     </div>
 
-    <!-- Start Time -->
-    <label for="startTime" class="form-label">Start Time:</label>
-    <input type="time" id="startTime" name="startTime" class="form-control">
+      <!-- Start Time -->
+      <label for="startTime" class="form-label">Start Time:</label>
+      <input type="time" id="startTime" name="startTime" class="form-control" min="">
+
+      <script>
+        const startTimeInput = document.getElementById('startTime');
+
+        function updateMinStartTime() {
+          const now = new Date();
+
+          // Add 5 minutes buffer to current time
+          now.setMinutes(now.getMinutes() + 5);
+
+          // Format time as HH:mm
+          let hours = now.getHours().toString().padStart(2, '0');
+          let minutes = now.getMinutes().toString().padStart(2, '0');
+          const currentTime = `${hours}:${minutes}`;
+
+          // Set minimum time
+          startTimeInput.min = currentTime;
+
+          // Clear input if selected time is before current time
+          if (startTimeInput.value && startTimeInput.value < currentTime) {
+            startTimeInput.value = '';
+          }
+        }
+
+        // Update when input is focused
+        startTimeInput.addEventListener('focus', updateMinStartTime);
+
+        // Initial setup
+        updateMinStartTime();
+
+        // Update every minute
+        setInterval(updateMinStartTime, 60000);
+      </script>
 
     <!-- Vehicle Dropdown -->
     <label for="vehicle" class="form-label">Select Vehicle:</label>

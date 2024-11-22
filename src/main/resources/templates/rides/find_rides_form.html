@@ -137,17 +137,25 @@
         </div>
 
 
-        <div id="oneTimeFields" class="mb-3">
-            <label for="date" class="form-label">Ride Date:</label>
-            <input type="date" id="date" name="date" class="form-control" min="">
-        </div>
+            <div id="oneTimeFields" class="mb-3">
+                <label for="date" class="form-label">Ride Date:</label>
+                <input type="date" id="date" name="date" class="form-control" min="">
+            </div>
 
-        <script>
-            // Set min date to today
-            const dateInput = document.getElementById('date');
-            const today = new Date().toISOString().split('T')[0];
-            dateInput.min = today;
-        </script>
+            <script>
+                // Get the date input element
+                const dateInput = document.getElementById('date');
+
+                // Get yesterday's date
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+
+                // Format as YYYY-MM-DD
+                const minDate = yesterday.toISOString().split('T')[0];
+
+                // Set minimum date to yesterday
+                dateInput.min = minDate;
+            </script>
         <!-- Recurring Ride Fields -->
         <div id="recurringFields" class="mb-3 hidden">
             <label for="daysOfWeek" class="form-label">Days of the Week:</label>
@@ -182,11 +190,46 @@
             </div>
         </div>
 
-        <div class="mb-3">
-            <label for="endTime" class="form-label">End Time:</label>
-            <input type="time" id="endTime" name="endTime" class="form-control">
-        </div>
 
+<!--            <label for="endTime" class="form-label">End Time:</label>-->
+<!--            <input type="time" id="endTime" name="endTime" class="form-control">-->
+            <div class="mb-3">
+            <!-- End Time -->
+            <label for="endTime" class="form-label">End Time:</label>
+            <input type="time" id="endTime" name="endTime" class="form-control" min="">
+            </div>
+            <script>
+                const startTimeInput = document.getElementById('startTime');
+
+                function updateMinStartTime() {
+                  const now = new Date();
+
+                  // Add 5 minutes buffer to current time
+                  now.setMinutes(now.getMinutes() + 5);
+
+                  // Format time as HH:mm
+                  let hours = now.getHours().toString().padStart(2, '0');
+                  let minutes = now.getMinutes().toString().padStart(2, '0');
+                  const currentTime = `${hours}:${minutes}`;
+
+                  // Set minimum time
+                  startTimeInput.min = currentTime;
+
+                  // Clear input if selected time is before current time
+                  if (startTimeInput.value && startTimeInput.value < currentTime) {
+                    startTimeInput.value = '';
+                  }
+                }
+
+                // Update when input is focused
+                startTimeInput.addEventListener('focus', updateMinStartTime);
+
+                // Initial setup
+                updateMinStartTime();
+
+                // Update every minute
+                setInterval(updateMinStartTime, 60000);
+            </script>
         <!-- Submit Button -->
         <div class="text-center">
             <button type="submit" class="btn btn-primary">Find</button>
