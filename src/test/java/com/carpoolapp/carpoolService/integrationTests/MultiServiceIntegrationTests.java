@@ -28,7 +28,7 @@ import java.time.LocalDate;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class RideControllerIntegrationTestWithServices {
+public class MultiServiceIntegrationTests {
 
     @Autowired
     private MockMvc mockMvc;
