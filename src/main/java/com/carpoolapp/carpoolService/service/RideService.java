@@ -3,11 +3,8 @@ package com.carpoolapp.carpoolService.service;
 import com.carpoolapp.carpoolService.dto.MatchingRideDto;
 import com.carpoolapp.carpoolService.dto.RideDto;
 import com.carpoolapp.carpoolService.models.*;
-import com.carpoolapp.carpoolService.models.enums.RideStatus;
-import com.carpoolapp.carpoolService.models.enums.RideType;
-import com.carpoolapp.carpoolService.repository.LocationRepository;
-import com.carpoolapp.carpoolService.repository.RideParticipantRepository;
-import com.carpoolapp.carpoolService.repository.RideRepository;
+import com.carpoolapp.carpoolService.models.enums.*;
+import com.carpoolapp.carpoolService.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -19,6 +16,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,6 +34,25 @@ public class RideService {
 
     @Autowired
     private RideParticipantRepository rideParticipantRepository;
+
+    @Autowired
+    private FareRepository fareRepository;
+
+    @Autowired
+    private TransactionRepository transactionRepository;
+
+    @Autowired
+    private RecurringToOneTimeRideLinkRepository recurringToOneTimeRideLinkRepository;
+
+
+    public User getDriver(Long rideId) {
+        return getDriverForRide(rideId);
+    }
+
+    private User getDriverForRide(Long rideId) {
+        return rideParticipantRepository.findDriverByRideId(rideId)
+                .orElseThrow(() -> new RuntimeException("Driver not found for ride ID: " + rideId));
+    }
 
     public LocalTime calculateEndTime(double startLat, double startLng, double destLat, double destLng, LocalTime startTime) {
         try {
@@ -80,7 +98,7 @@ public class RideService {
         ride.setStartTime(rideDto.getStartTime());
         ride.setEndTime(calculateEndTime(rideDto.getStartLatitude(), rideDto.getStartLongitude(), rideDto.getEndLatitude(), rideDto.getEndLongitude(), rideDto.getStartTime()));
         ride.setAvailableSeats(vehicle.getSeatCount() - 1); // Driver's seat
-        ride.setCreatedDate(LocalDateTime.now(ZoneId.of("UTC")).toLocalDate());
+        ride.setCreatedDate(LocalDateTime.now().toLocalDate());
 
         if (rideDto.getDate() != null) {
             ride.setDate(rideDto.getDate());
@@ -117,6 +135,71 @@ public class RideService {
                     return startDistance <= proximityThresholdKm && endDistance <= proximityThresholdKm;
                 })
                 .collect(Collectors.toList());
+    }
+
+    public void createOneTimeRideFromRecurringRide(Long recurringRideId) {
+        Ride recurringRide = rideRepository.findById(recurringRideId)
+                .orElseThrow(() -> new RuntimeException("Recurring ride not found"));
+
+        Ride oneTimeRide = new Ride();
+        oneTimeRide.setVehicle(recurringRide.getVehicle());
+        oneTimeRide.setPickupLocation(recurringRide.getPickupLocation());
+        oneTimeRide.setDestinationLocation(recurringRide.getDestinationLocation());
+        oneTimeRide.setStatus(RideStatus.CREATED);
+        oneTimeRide.setStartTime(recurringRide.getStartTime());
+        oneTimeRide.setEndTime(recurringRide.getEndTime());
+        oneTimeRide.setAvailableSeats(recurringRide.getAvailableSeats());
+        oneTimeRide.setCreatedDate(LocalDateTime.now().toLocalDate());
+        oneTimeRide.setDate(LocalDate.now());
+
+        Ride savedOneTimeRide = rideRepository.save(oneTimeRide);
+
+        RecurringToOneTimeRideLink link = new RecurringToOneTimeRideLink();
+        link.setRecurringRide(recurringRide);
+        link.setOneTimeRide(savedOneTimeRide);
+        recurringToOneTimeRideLinkRepository.save(link);
+
+        // create a fare for the one time ride from the recurring ride
+        Fare fare = new Fare();
+        fare.setRide(savedOneTimeRide);
+        Optional<Fare> recurringRideFare = fareRepository.findByRideId(recurringRideId);
+        fare.setAmount(recurringRideFare.map(Fare::getAmount).orElse(0.0));
+        fareRepository.save(fare);
+
+        // create ride participants for the one time ride from the recurring ride
+        // and count passengers
+        AtomicInteger passengerCount = new AtomicInteger();
+        List<RideParticipant> rideParticipants = rideParticipantRepository.findByRideId(recurringRideId);
+        rideParticipants.forEach(rideParticipant -> {
+            RideParticipant newRideParticipant = new RideParticipant();
+            newRideParticipant.setRide(savedOneTimeRide);
+            newRideParticipant.setParticipant(rideParticipant.getParticipant());
+            newRideParticipant.setRole(rideParticipant.getRole());
+            newRideParticipant.setStatus(rideParticipant.getStatus());
+            rideParticipantRepository.save(newRideParticipant);
+
+            if (rideParticipant.getRole() == RideParticipateRole.PASSENGER) {
+                passengerCount.getAndIncrement();
+            }
+        });
+
+        // if there are passengers,
+        // calculate per passenger fare and create transaction for each passenger
+        if (passengerCount.get() > 0) {
+            double perPassengerFare = fare.getAmount() / (passengerCount.get() + 1); // +1 for the driver
+            rideParticipants.forEach(rideParticipant -> {
+                if (rideParticipant.getRole() == RideParticipateRole.PASSENGER) {
+                    Transaction transaction = new Transaction();
+                    transaction.setUser(rideParticipant.getParticipant());
+                    transaction.setFare(fare);
+                    transaction.setStatus(TransactionStatus.PENDING);
+                    transaction.setDescription("Fare for ride " + savedOneTimeRide.getId());
+                    transaction.setAmount(perPassengerFare);
+                    transactionRepository.save(transaction);
+                }
+            });
+        }
+
     }
 
     private double haversine(double lat1, double lon1, double lat2, double lon2) {
