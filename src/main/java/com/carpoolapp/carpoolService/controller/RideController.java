@@ -67,8 +67,8 @@ public class RideController {
 
         List<UserRideInfoDto> upcomingRides = rideParticipantRepository.findUpcomingRidesForUser(
                 userId,
-                LocalDateTime.now(ZoneId.of("UTC")).toLocalDate(),
-                LocalDateTime.now(ZoneId.of("UTC")).toLocalTime(),
+                LocalDateTime.now().toLocalDate(),
+                LocalDateTime.now().toLocalTime(),
                 RideParticipantStatus.ACTIVE
         );
 
@@ -86,8 +86,8 @@ public class RideController {
 
         List<UserRideInfoDto> pastRides = rideParticipantRepository.findPastRidesForUser(
                 userId,
-                LocalDateTime.now(ZoneId.of("UTC")).toLocalDate(),
-                LocalDateTime.now(ZoneId.of("UTC")).toLocalTime(),
+                LocalDateTime.now().toLocalDate(),
+                LocalDateTime.now().toLocalTime(),
                 RideParticipantStatus.ACTIVE
         );
 
@@ -196,6 +196,20 @@ public class RideController {
 
         // Create a fare object for the ride
         fareService.createFare(createdRide);
+
+        // if it is a recurring ride and the current date is one of the days of the week and start time is in the future,
+        // create a one-time ride for the current date
+        // create a ride participant for the driver
+        // create a fare object for the ride
+        // link the recurring ride with the one-time ride
+        if (rideDto.getDaysOfWeek() != null && !rideDto.getDaysOfWeek().isEmpty()) {
+            List<String> daysOfWeek = Arrays.asList(rideDto.getDaysOfWeek().split(","));
+
+            if (daysOfWeek.contains(LocalDate.now().getDayOfWeek().name().substring(0, 3)) &&
+                    createdRide.getEndTime().isAfter(LocalDateTime.now().toLocalTime())) {
+                rideService.createOneTimeRideFromRecurringRide(createdRide.getId());
+            }
+        }
 
         redirectAttributes.addFlashAttribute("message", "Ride created successfully!");
 
@@ -323,6 +337,29 @@ public class RideController {
 
         // update the transaction amount for all the passengers
         transactionService.updateTransactionAmountOfPassengers(ride);
+
+        // if the ride is recurring,
+        // if there are any one-time rides that has date as the current date and start time in the future, or has a future date,
+        // create a ride participant for the passenger in the one-time ride
+        // decrease the available seats in the one-time ride
+        // create a transaction for the new passenger in the one-time ride
+        // update the transaction amount for all the passengers in the one-time ride
+        if (ride.getType() == RideType.RECURRING) {
+            List<Ride> oneTimeRides = rideRepository.findUpcomingOneTimeRidesForRecurringRide(ride.getId());
+            for (Ride oneTimeRide : oneTimeRides) {
+                rideParticipantService.createRideParticipantAsPassenger(oneTimeRide, passenger);
+
+                // decrease the available seats in the one-time ride
+                oneTimeRide.setAvailableSeats(oneTimeRide.getAvailableSeats() - 1);
+                rideRepository.save(oneTimeRide);
+
+                // create a transaction for the new passenger in the one-time ride
+                transactionService.createTransactionForPassenger(oneTimeRide, passenger, TransactionType.CREDIT, "Ride fare");
+
+                // update the transaction amount for all the passengers in the one-time ride
+                transactionService.updateTransactionAmountOfPassengers(oneTimeRide);
+            }
+        }
 
         redirectAttributes.addFlashAttribute("message", "Joined the ride successfully!");
 

@@ -85,8 +85,8 @@ public class TransactionService {
     }
 
     public List<RideOwedDto> getRidesWhereUserOwes(Long userId) {
-        List<Transaction> transactions = transactionRepository.findTransactionsOwedByUser(userId, LocalDateTime.now(ZoneId.of("UTC")).toLocalDate(),
-                LocalDateTime.now(ZoneId.of("UTC")).toLocalTime());
+        List<Transaction> transactions = transactionRepository.findTransactionsOwedByUser(userId, LocalDateTime.now().toLocalDate(),
+                LocalDateTime.now().toLocalTime());
         return transactions.stream().map(t -> {
             Ride ride = t.getFare().getRide();
             User driver = ride.getVehicle().getOwner();

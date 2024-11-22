@@ -48,6 +48,14 @@ public interface RideRepository extends JpaRepository<Ride, Long>  {
     List<MatchingRideDto> findRecurringRidesWithLocationsExcludingUser(@Param("endTimeMinus") LocalTime endTimeMinus,
                                                                        @Param("endTimePlus") LocalTime endTimePlus,
                                                                        @Param("userId") Long userId);
+
+    // find upcoming one-time rides for the recurring ride with the given id
+    // using the RecurringToOneTimeRideLink table
+    @Query("SELECT link.oneTimeRide FROM RecurringToOneTimeRideLink link " +
+            "WHERE link.recurringRide.id = :recurringRideId AND " +
+            "(link.oneTimeRide.date >= CURRENT_DATE" +
+            " OR (link.oneTimeRide.date = CURRENT_DATE AND link.oneTimeRide.endTime >= CURRENT_TIME))")
+    List<Ride> findUpcomingOneTimeRidesForRecurringRide(Long recurringRideId);
 }
 
 

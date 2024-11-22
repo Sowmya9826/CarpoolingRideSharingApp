@@ -36,10 +36,10 @@ public class PaymentController {
             return "redirect:/login";
         }
 
-        Double totalOwed = transactionRepository.findTotalOwedByUser(userId, LocalDateTime.now(ZoneId.of("UTC")).toLocalDate(),
-                LocalDateTime.now(ZoneId.of("UTC")).toLocalTime());
-        Double totalOwing = transactionRepository.findTotalOwedToUser(userId, LocalDateTime.now(ZoneId.of("UTC")).toLocalDate(),
-                LocalDateTime.now(ZoneId.of("UTC")).toLocalTime());
+        Double totalOwed = transactionRepository.findTotalOwedByUser(userId, LocalDateTime.now().toLocalDate(),
+                LocalDateTime.now().toLocalTime());
+        Double totalOwing = transactionRepository.findTotalOwedToUser(userId, LocalDateTime.now().toLocalDate(),
+                LocalDateTime.now().toLocalTime());
 
         PaymentSummaryDto paymentSummaryDto = new PaymentSummaryDto();
         paymentSummaryDto.setTotalOwed(totalOwed != null ? (Math.round(totalOwed * 100.0) / 100.0) : 0.0);
@@ -75,8 +75,8 @@ public class PaymentController {
             return "redirect:/auth/login";
         }
 
-        List<RideOwedToUserDto> ridesOwedToUser = transactionRepository.findRidesOwedToUser(userId, LocalDateTime.now(ZoneId.of("UTC")).toLocalDate(),
-                LocalDateTime.now(ZoneId.of("UTC")).toLocalTime());
+        List<RideOwedToUserDto> ridesOwedToUser = transactionRepository.findRidesOwedToUser(userId, LocalDateTime.now().toLocalDate(),
+                LocalDateTime.now().toLocalTime());
 
         // round the amount to 2 decimal places
         ridesOwedToUser.forEach(ride -> ride.setTotalAmountOwed(Math.round(ride.getTotalAmountOwed() * 100.0) / 100.0));
