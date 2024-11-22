@@ -13,7 +13,22 @@
   <!-- Custom JS -->
   <script src="/js/config.js"></script>
   <script src="/js/mapsHandler.js"></script>
-
+  <style>
+    /* Custom styles for centering content in the navbar */
+    .navbar-pastel {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+    .navbar-pastel .logout-button {
+      position: absolute;
+      right: 20px;
+    }
+    .navbar-pastel .navbar-brand {
+      color: #ffffff;
+    }
+  </style>
   <style>
     #map {
       height: 400px;
@@ -139,27 +154,30 @@
 <!--      <label for="date" class="form-label">Ride Date:</label>-->
 <!--      <input type="date" id="date" name="date" class="form-control"><br>-->
 <!--    </div>-->
+
       <div id="oneTimeFields" class="mb-3">
         <label for="date" class="form-label">Ride Date:</label>
-        <input type="date" id="date" name="date" class="form-control" min="">
+        <input type="date" id="date" name="date" class="form-control">
       </div>
 
       <script>
-        // Get the date input element
-        const dateInput = document.getElementById('date');
+        function setMinDate() {
+          const dateInput = document.getElementById('date');
+          const now = new Date();
 
-        // Get yesterday's date
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
+          // Format date to YYYY-MM-DD for date input
+          const formattedDate = now.toISOString().slice(0, 10);
 
-        // Format as YYYY-MM-DD
-        const minDate = yesterday.toISOString().split('T')[0];
+          // Set minimum date to current date
+          dateInput.min = formattedDate;
+        }
 
-        // Set minimum date to yesterday
-        dateInput.min = minDate;
+        // Call the function after the DOM is fully loaded
+        document.addEventListener("DOMContentLoaded", setMinDate);
       </script>
 
-    <!-- Recurring Ride Fields -->
+
+      <!-- Recurring Ride Fields -->
     <div id="recurringFields" class="mb-3 hidden">
       <label for="daysOfWeek" class="form-label">Days of the Week:</label>
       <!-- Checkbox for days -->
@@ -198,36 +216,21 @@
       <input type="time" id="startTime" name="startTime" class="form-control" min="">
 
       <script>
-        const startTimeInput = document.getElementById('startTime');
+        function setMinTime() {
+         const timeInput = document.getElementById('startTime');
+         const now = new Date();
 
-        function updateMinStartTime() {
-          const now = new Date();
+         // Format time to HH:MM
+         const currentHour = now.getHours().toString().padStart(2, '0');
+         const currentMinute = now.getMinutes().toString().padStart(2, '0');
+         const formattedTime = `${currentHour}:${currentMinute}`;
 
-          // Add 5 minutes buffer to current time
-          now.setMinutes(now.getMinutes() + 5);
-
-          // Format time as HH:mm
-          let hours = now.getHours().toString().padStart(2, '0');
-          let minutes = now.getMinutes().toString().padStart(2, '0');
-          const currentTime = `${hours}:${minutes}`;
-
-          // Set minimum time
-          startTimeInput.min = currentTime;
-
-          // Clear input if selected time is before current time
-          if (startTimeInput.value && startTimeInput.value < currentTime) {
-            startTimeInput.value = '';
-          }
+         // Set minimum time to current time
+         timeInput.min = formattedTime;
         }
 
-        // Update when input is focused
-        startTimeInput.addEventListener('focus', updateMinStartTime);
-
-        // Initial setup
-        updateMinStartTime();
-
-        // Update every minute
-        setInterval(updateMinStartTime, 60000);
+        // Call on page load
+        window.onload = setMinTime;
       </script>
 
     <!-- Vehicle Dropdown -->
