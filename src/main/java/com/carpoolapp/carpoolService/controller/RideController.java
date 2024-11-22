@@ -55,6 +55,9 @@ public class RideController {
     private RideParticipantService rideParticipantService;
 
     @Autowired
+    private WalletService walletService;
+
+    @Autowired
     private RideParticipantRepository rideParticipantRepository;
 
 
@@ -129,10 +132,17 @@ public class RideController {
 
 
     @GetMapping("/create")
-    public String showCreateRidePage(HttpSession session, Model model) {
+    public String showCreateRidePage(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) {
             return "redirect:/auth/login";
+        }
+
+        Wallet wallet = walletService.getWalletByUserId(userId);
+        if (wallet == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "You need to set up your wallet to create a ride!");
+
+            return "redirect:/wallet/";
         }
 
         // Fetch the user's vehicles
@@ -296,10 +306,17 @@ public class RideController {
 
 
     @GetMapping("/find")
-    public String showFindRidesPage(HttpSession session, Model model) {
+    public String showFindRidesPage(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) {
             return "redirect:/auth/login";
+        }
+
+        Wallet wallet = walletService.getWalletByUserId(userId);
+        if (wallet == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "You need to set up your wallet to find rides!");
+
+            return "redirect:/wallet/";
         }
 
         return "rides/find_rides_form";
