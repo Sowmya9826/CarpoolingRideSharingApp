@@ -1,6 +1,5 @@
 package com.carpoolapp.carpoolService.service;
 
-import com.carpoolapp.carpoolService.dto.RideParticipantDto;
 import com.carpoolapp.carpoolService.dto.UserDto;
 import com.carpoolapp.carpoolService.models.User;
 import com.carpoolapp.carpoolService.repository.UserRepository;
@@ -17,15 +16,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Base64;
-import java.util.Date;
-import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
