@@ -34,7 +34,7 @@
   </style>
     <script>
     function toggleRideTypeFields() {
-      const rideType = document.querySelector('input[name="isRecurring"]:checked').value;
+      const rideType = document.querySelector('input[name="recurring"]:checked').value;
       if (rideType === "true") {
         document.getElementById("dateField").classList.add("hidden");
       } else {
@@ -94,11 +94,11 @@
         <div class="mb-3">
             <label class="form-label"></label><br>
             <div class="form-check form-check-inline">
-                <input type="radio" id="oneTime" name="isRecurring" class="form-check-input" value="false" checked onclick="toggleRideTypeFields()">
+                <input type="radio" id="oneTime" name="recurring" class="form-check-input" value="false" checked onclick="toggleRideTypeFields()">
                 <label for="oneTime" class="form-check-label">One-Time</label>
             </div>
             <div class="form-check form-check-inline">
-                <input type="radio" id="recurring" name="isRecurring" class="form-check-input" value="true" onclick="toggleRideTypeFields()">
+                <input type="radio" id="recurring" name="recurring" class="form-check-input" value="true" onclick="toggleRideTypeFields()">
                 <label for="recurring" class="form-check-label">Recurring</label>
             </div>
         </div>
