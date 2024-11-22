@@ -2,7 +2,6 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>User Profile</title>
-
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <!-- Bootstrap CSS -->
@@ -14,69 +13,33 @@
     <!-- Custom JS -->
     <script src="/js/config.js"></script>
     <script src="/js/mapsHandler.js"></script>
-
     <style>
-        #map {
-          height: 400px;
-          width: 100%;
-          margin-bottom: 20px;
+        /* Custom styles for centering content in the navbar */
+        .navbar-pastel {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          position: relative;
+        }
+        .navbar-pastel .logout-button {
+          position: absolute;
+          right: 20px;
+        }
+        .navbar-pastel .navbar-brand {
+          color: #ffffff;
         }
         .hidden {
           display: none;
         }
     </style>
-
     <script>
         function toggleRideTypeFields() {
-          const rideType = document.querySelector('input[name="isRecurring"]:checked').value;
+          const rideType = document.querySelector('input[name="recurring"]:checked').value;
           if (rideType === "true") {
-            document.getElementById("recurringFields").classList.remove("hidden");
-            document.getElementById("oneTimeFields").classList.add("hidden");
+            document.getElementById("dateField").classList.add("hidden");
           } else {
-            document.getElementById("recurringFields").classList.add("hidden");
-            document.getElementById("oneTimeFields").classList.remove("hidden");
+            document.getElementById("dateField").classList.remove("hidden");
           }
-        }
-
-        function geocodeAddress(address, markerType) {
-          const geocoder = new google.maps.Geocoder();
-          geocoder.geocode({ address: address }, function(results, status) {
-            if (status === "OK") {
-              const latLng = results[0].geometry.location;
-              const lat = latLng.lat();
-              const lng = latLng.lng();
-
-              // Place marker on the map
-              if (markerType === "start") {
-                if (startMarker) {
-                  startMarker.setMap(null);
-                }
-                startMarker = new google.maps.Marker({
-                  position: latLng,
-                  map: map,
-                  label: "S",
-                });
-                document.getElementById("startLatitude").value = lat;
-                document.getElementById("startLongitude").value = lng;
-                document.getElementById("startAddress").value = results[0].formatted_address;
-              } else {
-                if (endMarker) {
-                  endMarker.setMap(null);
-                }
-                endMarker = new google.maps.Marker({
-                  position: latLng,
-                  map: map,
-                  label: "D",
-                });
-                document.getElementById("endLatitude").value = lat;
-                document.getElementById("endLongitude").value = lng;
-                document.getElementById("endAddress").value = results[0].formatted_address;
-              }
-              map.setCenter(latLng); // Center map on the address
-            } else {
-              alert("Geocoding failed: " + status);
-            }
-          });
         }
     </script>
 
@@ -85,6 +48,7 @@
 <!-- Navigation Bar -->
 <nav class="navbar navbar-expand-lg navbar-pastel">
     <div class="container-fluid">
+        <!-- Back Button with Arrow that Redirects to Previous Page -->
         <button class="btn btn-outline-primary" onclick="window.history.back();">
             <i class="bi bi-arrow-left"></i> Back
         </button>
@@ -105,20 +69,23 @@
         <div id="map"></div>
 
         <!-- Start Location Inputs -->
-        <form id="findRideForm" onsubmit="submitFindRideForm(event)">
         <div class="mb-3">
-            <label for="startAddress" class="form-label">Start Address:</label>
-            <input type="text" id="startAddress" name="startAddress" class="form-control" placeholder="Enter Start Address" required>
-            <button type="button" id="setStart" class="btn btn-primary maps-loc-select" onclick="geocodeAddress(document.getElementById('startAddress').value, 'start')">Set Start</button>
+            <label for="startLatitude" class="form-label">Latitude:</label>
+            <div class="input-group">
+                <input type="text" id="startAddress" name="startAddress" class="form-control rounded-start" placeholder="Click 'Set Start' and select on map" readonly>
+                <button type="button" id="setStart" class="btn btn-primary maps-loc-select rounded-end">Set Start</button>
+            </div>
             <input type="hidden" id="startLatitude" name="startLatitude">
             <input type="hidden" id="startLongitude" name="startLongitude">
         </div>
 
         <!-- Destination Location Inputs -->
         <div class="mb-3">
-            <label for="endAddress" class="form-label">Destination Address:</label>
-            <input type="text" id="endAddress" name="endAddress" class="form-control" placeholder="Enter Destination Address" required>
-            <button type="button" id="setDestination" class="btn btn-primary maps-loc-select" onclick="geocodeAddress(document.getElementById('endAddress').value, 'destination')">Set Destination</button>
+            <label for="endLatitude" class="form-label">Destination Location</label>
+            <div class="input-group">
+                <input type="text" id="endAddress" name="endAddress" class="form-control rounded-start" placeholder="Click 'Set Destination' and select on map" readonly>
+                <button type="button" id="setDestination" class="btn btn-primary maps-loc-select rounded-end">Set Destination</button>
+            </div>
             <input type="hidden" id="endLatitude" name="endLatitude">
             <input type="hidden" id="endLongitude" name="endLongitude">
         </div>
@@ -127,115 +94,30 @@
         <div class="mb-3">
             <label class="form-label"></label><br>
             <div class="form-check form-check-inline">
-                <input type="radio" id="oneTime" name="isRecurring" class="form-check-input" value="false" checked onclick="toggleRideTypeFields()">
+                <input type="radio" id="oneTime" name="recurring" class="form-check-input" value="false" checked onclick="toggleRideTypeFields()">
                 <label for="oneTime" class="form-check-label">One-Time</label>
             </div>
             <div class="form-check form-check-inline">
-                <input type="radio" id="recurring" name="isRecurring" class="form-check-input" value="true" onclick="toggleRideTypeFields()">
+                <input type="radio" id="recurring" name="recurring" class="form-check-input" value="true" onclick="toggleRideTypeFields()">
                 <label for="recurring" class="form-check-label">Recurring</label>
             </div>
         </div>
 
-
-            <div id="oneTimeFields" class="mb-3">
-                <label for="date" class="form-label">Ride Date:</label>
-                <input type="date" id="date" name="date" class="form-control" min="">
-            </div>
-
-            <script>
-                // Get the date input element
-                const dateInput = document.getElementById('date');
-
-                // Get yesterday's date
-                const yesterday = new Date();
-                yesterday.setDate(yesterday.getDate() - 1);
-
-                // Format as YYYY-MM-DD
-                const minDate = yesterday.toISOString().split('T')[0];
-
-                // Set minimum date to yesterday
-                dateInput.min = minDate;
-            </script>
-        <!-- Recurring Ride Fields -->
-        <div id="recurringFields" class="mb-3 hidden">
-            <label for="daysOfWeek" class="form-label">Days of the Week:</label>
-            <!-- Checkbox for days -->
-            <div class="form-check">
-                <input type="checkbox" id="monday" name="daysOfWeek" value="MON" class="form-check-input">
-                <label for="monday" class="form-check-label">Monday</label>
-            </div>
-            <div class="form-check">
-                <input type="checkbox" id="tuesday" name="daysOfWeek" value="TUE" class="form-check-input">
-                <label for="tuesday" class="form-check-label">Tuesday</label>
-            </div>
-            <div class="form-check">
-                <input type="checkbox" id="wednesday" name="daysOfWeek" value="WED" class="form-check-input">
-                <label for="wednesday" class="form-check-label">Wednesday</label>
-            </div>
-            <div class="form-check">
-                <input type="checkbox" id="thursday" name="daysOfWeek" value="THU" class="form-check-input">
-                <label for="thursday" class="form-check-label">Thursday</label>
-            </div>
-            <div class="form-check">
-                <input type="checkbox" id="friday" name="daysOfWeek" value="FRI" class="form-check-input">
-                <label for="friday" class="form-check-label">Friday</label>
-            </div>
-            <div class="form-check">
-                <input type="checkbox" id="saturday" name="daysOfWeek" value="SAT" class="form-check-input">
-                <label for="saturday" class="form-check-label">Saturday</label>
-            </div>
-            <div class="form-check">
-                <input type="checkbox" id="sunday" name="daysOfWeek" value="SUN" class="form-check-input">
-                <label for="sunday" class="form-check-label">Sunday</label>
-            </div>
+        <div id="dateField" class="mb-3">
+            <label for="date" class="form-label">Ride Date:</label>
+            <input type="date" id="date" name="date" class="form-control"><br>
         </div>
 
-
-<!--            <label for="endTime" class="form-label">End Time:</label>-->
-<!--            <input type="time" id="endTime" name="endTime" class="form-control">-->
-            <div class="mb-3">
-            <!-- End Time -->
+        <div class="mb-3">
             <label for="endTime" class="form-label">End Time:</label>
-            <input type="time" id="endTime" name="endTime" class="form-control" min="">
-            </div>
-            <script>
-                const startTimeInput = document.getElementById('startTime');
+            <input type="time" id="endTime" name="endTime" class="form-control">
+        </div>
 
-                function updateMinStartTime() {
-                  const now = new Date();
-
-                  // Add 5 minutes buffer to current time
-                  now.setMinutes(now.getMinutes() + 5);
-
-                  // Format time as HH:mm
-                  let hours = now.getHours().toString().padStart(2, '0');
-                  let minutes = now.getMinutes().toString().padStart(2, '0');
-                  const currentTime = `${hours}:${minutes}`;
-
-                  // Set minimum time
-                  startTimeInput.min = currentTime;
-
-                  // Clear input if selected time is before current time
-                  if (startTimeInput.value && startTimeInput.value < currentTime) {
-                    startTimeInput.value = '';
-                  }
-                }
-
-                // Update when input is focused
-                startTimeInput.addEventListener('focus', updateMinStartTime);
-
-                // Initial setup
-                updateMinStartTime();
-
-                // Update every minute
-                setInterval(updateMinStartTime, 60000);
-            </script>
         <!-- Submit Button -->
         <div class="text-center">
             <button type="submit" class="btn btn-primary">Find</button>
         </div>
     </form>
-
 </div>
 </body>
 </html>
