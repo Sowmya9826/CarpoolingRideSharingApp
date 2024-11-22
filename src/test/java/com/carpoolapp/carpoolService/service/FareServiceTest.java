@@ -6,6 +6,7 @@ import com.carpoolapp.carpoolService.models.Ride;
 import com.carpoolapp.carpoolService.repository.FareRepository;
 import com.carpoolapp.carpoolService.repository.RideParticipantRepository;
 import com.carpoolapp.carpoolService.repository.RideRepository;
+import com.carpoolapp.carpoolService.service.FareService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
