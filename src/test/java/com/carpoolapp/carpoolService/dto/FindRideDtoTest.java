@@ -118,7 +118,7 @@ class FindRideDtoTest {
         assertTrue(toString.contains("endLongitude=78.901"));
         assertTrue(toString.contains("date=" + date));
         assertTrue(toString.contains("endTime=" + time));
-        assertTrue(toString.contains("isRecurring=true"));
+        assertTrue(toString.contains("recurring=true"));
     }
 
     @Test

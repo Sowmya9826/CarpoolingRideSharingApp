@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>User Profile</title>
+    <title>Create Ride</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <!-- Bootstrap CSS -->
@@ -13,33 +14,69 @@
     <!-- Custom JS -->
     <script src="/js/config.js"></script>
     <script src="/js/mapsHandler.js"></script>
+
     <style>
-        /* Custom styles for centering content in the navbar */
-        .navbar-pastel {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          position: relative;
-        }
-        .navbar-pastel .logout-button {
-          position: absolute;
-          right: 20px;
-        }
-        .navbar-pastel .navbar-brand {
-          color: #ffffff;
+        #map {
+          height: 400px;
+          width: 100%;
+          margin-bottom: 20px;
         }
         .hidden {
           display: none;
         }
     </style>
+
     <script>
         function toggleRideTypeFields() {
-          const rideType = document.querySelector('input[name="recurring"]:checked').value;
+          const rideType = document.querySelector('input[name="isRecurring"]:checked').value;
           if (rideType === "true") {
-            document.getElementById("dateField").classList.add("hidden");
+            document.getElementById("recurringFields").classList.remove("hidden");
+            document.getElementById("oneTimeFields").classList.add("hidden");
           } else {
-            document.getElementById("dateField").classList.remove("hidden");
+            document.getElementById("recurringFields").classList.add("hidden");
+            document.getElementById("oneTimeFields").classList.remove("hidden");
           }
+        }
+
+        function geocodeAddress(address, markerType) {
+          const geocoder = new google.maps.Geocoder();
+          geocoder.geocode({ address: address }, function(results, status) {
+            if (status === "OK") {
+              const latLng = results[0].geometry.location;
+              const lat = latLng.lat();
+              const lng = latLng.lng();
+
+              // Place marker on the map
+              if (markerType === "start") {
+                if (startMarker) {
+                  startMarker.setMap(null);
+                }
+                startMarker = new google.maps.Marker({
+                  position: latLng,
+                  map: map,
+                  label: "S",
+                });
+                document.getElementById("startLatitude").value = lat;
+                document.getElementById("startLongitude").value = lng;
+                document.getElementById("startAddress").value = results[0].formatted_address;
+              } else {
+                if (endMarker) {
+                  endMarker.setMap(null);
+                }
+                endMarker = new google.maps.Marker({
+                  position: latLng,
+                  map: map,
+                  label: "D",
+                });
+                document.getElementById("endLatitude").value = lat;
+                document.getElementById("endLongitude").value = lng;
+                document.getElementById("endAddress").value = results[0].formatted_address;
+              }
+              map.setCenter(latLng); // Center map on the address
+            } else {
+              alert("Geocoding failed: " + status);
+            }
+          });
         }
     </script>
 
@@ -48,7 +85,6 @@
 <!-- Navigation Bar -->
 <nav class="navbar navbar-expand-lg navbar-pastel">
     <div class="container-fluid">
-        <!-- Back Button with Arrow that Redirects to Previous Page -->
         <button class="btn btn-outline-primary" onclick="window.history.back();">
             <i class="bi bi-arrow-left"></i> Back
         </button>
@@ -69,26 +105,23 @@
         <div id="map"></div>
 
         <!-- Start Location Inputs -->
-        <div class="mb-3">
-            <label for="startLatitude" class="form-label">Latitude:</label>
-            <div class="input-group">
-                <input type="text" id="startAddress" name="startAddress" class="form-control rounded-start" placeholder="Click 'Set Start' and select on map" readonly>
-                <button type="button" id="setStart" class="btn btn-primary maps-loc-select rounded-end">Set Start</button>
+        <form id="createRideForm" onsubmit="submitCreateRideForm(event)">
+            <div class="mb-3">
+                <label for="startAddress" class="form-label">Start Address:</label>
+                <input type="text" id="startAddress" name="startAddress" class="form-control" placeholder="Enter Start Address" required>
+                <button type="button" id="setStart" class="btn btn-primary maps-loc-select" onclick="geocodeAddress(document.getElementById('startAddress').value, 'start')">Set Start</button>
+                <input type="hidden" id="startLatitude" name="startLatitude">
+                <input type="hidden" id="startLongitude" name="startLongitude">
             </div>
-            <input type="hidden" id="startLatitude" name="startLatitude">
-            <input type="hidden" id="startLongitude" name="startLongitude">
-        </div>
 
-        <!-- Destination Location Inputs -->
-        <div class="mb-3">
-            <label for="endLatitude" class="form-label">Destination Location</label>
-            <div class="input-group">
-                <input type="text" id="endAddress" name="endAddress" class="form-control rounded-start" placeholder="Click 'Set Destination' and select on map" readonly>
-                <button type="button" id="setDestination" class="btn btn-primary maps-loc-select rounded-end">Set Destination</button>
+            <!-- Destination Location Inputs -->
+            <div class="mb-3">
+                <label for="endAddress" class="form-label">Destination Address:</label>
+                <input type="text" id="endAddress" name="endAddress" class="form-control" placeholder="Enter Destination Address" required>
+                <button type="button" id="setDestination" class="btn btn-primary maps-loc-select" onclick="geocodeAddress(document.getElementById('endAddress').value, 'destination')">Set Destination</button>
+                <input type="hidden" id="endLatitude" name="endLatitude">
+                <input type="hidden" id="endLongitude" name="endLongitude">
             </div>
-            <input type="hidden" id="endLatitude" name="endLatitude">
-            <input type="hidden" id="endLongitude" name="endLongitude">
-        </div>
 
         <!-- Ride Type -->
         <div class="mb-3">
@@ -107,6 +140,23 @@
             <label for="date" class="form-label">Ride Date:</label>
             <input type="date" id="date" name="date" class="form-control"><br>
         </div>
+
+            <script>
+                function setMinDate() {
+                  const dateInput = document.getElementById('date');
+                  const now = new Date();
+
+                  // Format date to YYYY-MM-DD for date input
+                  const formattedDate = now.toISOString().slice(0, 10);
+
+                  // Set minimum date to current date
+                  dateInput.min = formattedDate;
+                }
+
+                // Call the function after the DOM is fully loaded
+                document.addEventListener("DOMContentLoaded", setMinDate);
+            </script>
+
 
         <div class="mb-3">
             <label for="endTime" class="form-label">End Time:</label>
