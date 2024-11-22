@@ -46,4 +46,26 @@ public class WalletService {
 
         walletRepository.save(wallet);
     }
+
+    public void pay(Wallet wallet, Double amount) {
+        double currentBalance = wallet.getBalance();
+        double newBalance = currentBalance - amount;
+
+        // Round to 2 decimal places
+        newBalance = Math.round(newBalance * 100.0) / 100.0;
+
+        wallet.setBalance(newBalance);
+        walletRepository.save(wallet);
+    }
+
+    public void credit(Wallet wallet, double amount) {
+        double currentBalance = wallet.getBalance();
+        double newBalance = currentBalance + amount;
+
+        // Round to 2 decimal places
+        newBalance = Math.round(newBalance * 100.0) / 100.0;
+
+        wallet.setBalance(newBalance);
+        walletRepository.save(wallet);
+    }
 }

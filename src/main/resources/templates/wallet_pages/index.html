@@ -25,6 +25,10 @@
       <p th:text="${message}"></p>
     </div>
 
+    <div th:if="${errorMessage}" class="alert alert-warning text-center">
+      <p th:text="${errorMessage}"></p>
+    </div>
+
     <!-- Display Current Balance -->
     <div class="text-center mt-4">
       <h2>Current Balance: $<span th:text="${wallet.balance}">0.00</span></h2>

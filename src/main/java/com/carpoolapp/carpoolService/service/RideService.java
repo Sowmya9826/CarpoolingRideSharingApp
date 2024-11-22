@@ -44,6 +44,16 @@ public class RideService {
     @Autowired
     private RecurringToOneTimeRideLinkRepository recurringToOneTimeRideLinkRepository;
 
+
+    public User getDriver(Long rideId) {
+        return getDriverForRide(rideId);
+    }
+
+    private User getDriverForRide(Long rideId) {
+        return rideParticipantRepository.findDriverByRideId(rideId)
+                .orElseThrow(() -> new RuntimeException("Driver not found for ride ID: " + rideId));
+    }
+
     public LocalTime calculateEndTime(double startLat, double startLng, double destLat, double destLng, LocalTime startTime) {
         try {
             String url = String.format(

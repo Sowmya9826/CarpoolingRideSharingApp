@@ -31,10 +31,8 @@
       <a th:href="@{/payments/rides-owed}" class="btn btn-primary mt-3">View Rides You Owe</a>
       <div class="mt-4">
         <form th:action="@{/payments/pay-all-owed}" method="post">
-          <!-- Button when there is an amount owed -->
-          <form th:action="@{/payments/pay-all-owed}" method="post">
-            <button type="submit" class="btn btn-primary">Pay All </button>
-          </form>
+          <input type="hidden" name="amount" th:value="${paymentSummary.totalOwed}" />
+          <button type="submit" class="btn btn-primary">Pay All </button>
         </form>
       </div>
     </div>

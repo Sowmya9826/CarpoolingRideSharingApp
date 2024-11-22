@@ -3,6 +3,7 @@ package com.carpoolapp.carpoolService.repository;
 import com.carpoolapp.carpoolService.dto.RideParticipantDto;
 import com.carpoolapp.carpoolService.dto.UserRideInfoDto;
 import com.carpoolapp.carpoolService.models.RideParticipant;
+import com.carpoolapp.carpoolService.models.User;
 import com.carpoolapp.carpoolService.models.enums.RideParticipantStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -67,4 +68,9 @@ public interface RideParticipantRepository extends JpaRepository<RideParticipant
             "AND rp.status = com.carpoolapp.carpoolService.models.enums.RideParticipantStatus.ACTIVE " +
             "AND rp.role = com.carpoolapp.carpoolService.models.enums.RideParticipateRole.PASSENGER")
     int countActivePassengersInRide(Long rideId);
+
+
+    @Query("SELECT rp.participant FROM RideParticipant rp " +
+            "WHERE rp.ride.id = :rideId AND rp.role = com.carpoolapp.carpoolService.models.enums.RideParticipateRole.DRIVER")
+    Optional<User> findDriverByRideId(@Param("rideId") Long rideId);
 }

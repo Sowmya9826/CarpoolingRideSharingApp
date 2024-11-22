@@ -1,10 +1,7 @@
 package com.carpoolapp.carpoolService.service;
 
 import com.carpoolapp.carpoolService.dto.RideOwedDto;
-import com.carpoolapp.carpoolService.models.Fare;
-import com.carpoolapp.carpoolService.models.Ride;
-import com.carpoolapp.carpoolService.models.Transaction;
-import com.carpoolapp.carpoolService.models.User;
+import com.carpoolapp.carpoolService.models.*;
 import com.carpoolapp.carpoolService.models.enums.TransactionStatus;
 import com.carpoolapp.carpoolService.models.enums.TransactionType;
 import com.carpoolapp.carpoolService.repository.FareRepository;
@@ -34,6 +31,12 @@ public class TransactionService {
 
     @Autowired
     private RideParticipantRepository rideParticipantRepository;
+
+    @Autowired
+    private RideService rideService;
+
+    @Autowired
+    private WalletService walletService;
 
     public void updateTransactionAmountOfPassengers(Ride ride) {
         // count the number of passengers in the ride
@@ -116,6 +119,14 @@ public class TransactionService {
 
         // Update each transaction's status to COMPLETED
         for (Transaction transaction : pendingTransactions) {
+            Ride ride = transaction.getFare().getRide();
+            User driver = rideService.getDriver(ride.getId());
+
+            Wallet driverWallet = walletService.getWalletByUserId(driver.getId());
+            if (driverWallet != null) {
+                walletService.credit(driverWallet, transaction.getAmount());
+            }
+
             transaction.setStatus(TransactionStatus.COMPLETED);
             transaction.setCompletedDate(LocalDate.now());
         }
