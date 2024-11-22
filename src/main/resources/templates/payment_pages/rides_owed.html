@@ -46,7 +46,7 @@
           <strong>Driver Contact:</strong> <span th:text="${ride.driverPhoneNumber}">Phone Number</span><br>
         </p>
         <div class="amount-owed">
-          You owe <span th:text="'$' + ${ride.amountOwed}" class="badge margin-left-1em bg-red me-2">0.00</span>
+          You owe <span th:text="'$' + ${ride.amountOwed}" class="badge bg-red me-2">0.00</span>
         </div>
         <form th:action="@{'/payments/' + ${ride.id} + '/pay'}" method="post">
           <input type="hidden" name="amount" th:value="${ride.amountOwed}" />
