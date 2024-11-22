@@ -53,9 +53,9 @@ public interface RideRepository extends JpaRepository<Ride, Long>  {
     // using the RecurringToOneTimeRideLink table
     @Query("SELECT link.oneTimeRide FROM RecurringToOneTimeRideLink link " +
             "WHERE link.recurringRide.id = :recurringRideId AND " +
-            "(link.oneTimeRide.date >= CURRENT_DATE" +
-            " OR (link.oneTimeRide.date = CURRENT_DATE AND link.oneTimeRide.endTime >= CURRENT_TIME))")
-    List<Ride> findUpcomingOneTimeRidesForRecurringRide(Long recurringRideId);
+            "(link.oneTimeRide.date > :currentDate " +
+            "OR (link.oneTimeRide.date = :currentDate AND link.oneTimeRide.endTime >= :currentTime))")
+    List<Ride> findUpcomingOneTimeRidesForRecurringRide(@Param("recurringRideId") Long recurringRideId, @Param("currentDate") LocalDate currentDate, @Param("currentTime") LocalTime currentTime);
 }
 
 

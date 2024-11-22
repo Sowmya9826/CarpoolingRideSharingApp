@@ -241,6 +241,22 @@ public class RideController {
 
             // delete the fare
             fareService.deleteFareForRide(ride);
+
+            // if the ride is recurring, delete all the one-time rides
+            if (ride.getType() == RideType.RECURRING) {
+                List<Ride> oneTimeRides = rideRepository.findUpcomingOneTimeRidesForRecurringRide(ride.getId(), LocalDateTime.now().toLocalDate(), LocalDateTime.now().toLocalTime());
+                for (Ride oneTimeRide : oneTimeRides) {
+                    oneTimeRide.setStatus(RideStatus.CANCELLED);
+                    rideRepository.save(oneTimeRide);
+                    rideParticipantService.markRideParticipantsAsCancelled(oneTimeRide);
+
+                    // delete all the transactions
+                    transactionService.deleteTransactionsForRide(oneTimeRide);
+
+                    // delete the fare
+                    fareService.deleteFareForRide(oneTimeRide);
+                }
+            }
         } else {
             rideParticipantService.markRideParticipantAsCancelled(ride, userId);
 
@@ -253,6 +269,24 @@ public class RideController {
 
             // update the transaction amount for all the passengers
             transactionService.updateTransactionAmountOfPassengers(ride);
+
+            // if the ride is recurring, cancel the user from all the one-time rides
+            if (ride.getType() == RideType.RECURRING) {
+                List<Ride> oneTimeRides = rideRepository.findUpcomingOneTimeRidesForRecurringRide(ride.getId(), LocalDateTime.now().toLocalDate(), LocalDateTime.now().toLocalTime());
+                for (Ride oneTimeRide : oneTimeRides) {
+                    rideParticipantService.markRideParticipantAsCancelled(oneTimeRide, userId);
+
+                    // increase the available seats in the one-time ride
+                    oneTimeRide.setAvailableSeats(oneTimeRide.getAvailableSeats() + 1);
+                    rideRepository.save(oneTimeRide);
+
+                    // delete the transaction for the user in the one-time ride
+                    transactionService.deleteTransactionForUserInRide(userId, oneTimeRide);
+
+                    // update the transaction amount for all the passengers in the one-time ride
+                    transactionService.updateTransactionAmountOfPassengers(oneTimeRide);
+                }
+            }
         }
 
         redirectAttributes.addFlashAttribute("message", "Ride cancelled successfully!");
@@ -345,7 +379,7 @@ public class RideController {
         // create a transaction for the new passenger in the one-time ride
         // update the transaction amount for all the passengers in the one-time ride
         if (ride.getType() == RideType.RECURRING) {
-            List<Ride> oneTimeRides = rideRepository.findUpcomingOneTimeRidesForRecurringRide(ride.getId());
+            List<Ride> oneTimeRides = rideRepository.findUpcomingOneTimeRidesForRecurringRide(ride.getId(), LocalDateTime.now().toLocalDate(), LocalDateTime.now().toLocalTime());
             for (Ride oneTimeRide : oneTimeRides) {
                 rideParticipantService.createRideParticipantAsPassenger(oneTimeRide, passenger);
 
