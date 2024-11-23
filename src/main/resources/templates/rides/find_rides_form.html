@@ -141,20 +141,45 @@
             <input type="date" id="date" name="date" class="form-control"><br>
         </div>
 
+<!--            <script>-->
+<!--                function setMinDate() {-->
+<!--                  const dateInput = document.getElementById('date');-->
+<!--                  const now = new Date();-->
+
+<!--                  // Format date to YYYY-MM-DD for date input-->
+<!--                  const formattedDate = now.toISOString().slice(0, 10);-->
+
+<!--                  // Set minimum date to current date-->
+<!--                  dateInput.min = formattedDate;-->
+<!--                }-->
+
+<!--                // Call the function after the DOM is fully loaded-->
+<!--                document.addEventListener("DOMContentLoaded", setMinDate);-->
+<!--            </script>-->
             <script>
                 function setMinDate() {
-                  const dateInput = document.getElementById('date');
-                  const now = new Date();
+                    const dateInput = document.getElementById('date');
+                    const today = new Date();
 
-                  // Format date to YYYY-MM-DD for date input
-                  const formattedDate = now.toISOString().slice(0, 10);
+                    // Format date to YYYY-MM-DD
+                    const year = today.getFullYear();
+                    const month = (today.getMonth() + 1).toString().padStart(2, '0');
+                    const day = today.getDate().toString().padStart(2, '0');
+                    const formattedDate = `${year}-${month}-${day}`;
 
-                  // Set minimum date to current date
-                  dateInput.min = formattedDate;
+                    // Set minimum date AND default value to today
+                    dateInput.min = formattedDate;
+                    dateInput.value = formattedDate;  // Set today as default value
+
+
                 }
 
-                // Call the function after the DOM is fully loaded
-                document.addEventListener("DOMContentLoaded", setMinDate);
+                // Call when DOM is loaded
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', setMinDate);
+                } else {
+                    setMinDate(); // If DOM is already loaded
+                }
             </script>
 
 
@@ -162,12 +187,48 @@
             <label for="endTime" class="form-label">End Time:</label>
             <input type="time" id="endTime" name="endTime" class="form-control">
         </div>
+            <script>
+                function setEndTime() {
+                    const endTimeInput = document.getElementById('endTime');
+                    const now = new Date();
 
-        <!-- Submit Button -->
-        <div class="text-center">
-            <button type="submit" class="btn btn-primary">Find</button>
-        </div>
-    </form>
-</div>
-</body>
-</html>
+
+                    now.setMinutes(now.getMinutes() );
+
+                    // Format time to HH:MM
+                    const hours = now.getHours().toString().padStart(2, '0');
+                    const minutes = now.getMinutes().toString().padStart(2, '0');
+                    const formattedTime = `${hours}:${minutes}`;
+
+                    // Set minimum and default value
+                    endTimeInput.min = formattedTime;
+                    endTimeInput.value = formattedTime;
+                }
+
+                // Update time every minute to keep current
+                function updateTime() {
+                    setEndTime();
+                }
+
+                // Initial set
+                setEndTime();
+
+
+                // Also update when the page becomes visible again
+                document.addEventListener('visibilitychange', function() {
+                    if (!document.hidden) {
+                        setEndTime();
+                    }
+                });
+            </script>
+
+
+                <!-- Submit Button -->
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Find</button>
+                </div>
+
+            </form>
+            </div>
+        </body>
+        </html>
