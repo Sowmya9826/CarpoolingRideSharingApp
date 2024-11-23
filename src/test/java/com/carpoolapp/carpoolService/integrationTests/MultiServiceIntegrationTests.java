@@ -1,17 +1,9 @@
 package com.carpoolapp.carpoolService.integrationTests;
 
-import com.carpoolapp.carpoolService.models.Fare;
-import com.carpoolapp.carpoolService.models.Ride;
-import com.carpoolapp.carpoolService.models.RideParticipant;
-import com.carpoolapp.carpoolService.models.User;
-import com.carpoolapp.carpoolService.models.Vehicle;
+import com.carpoolapp.carpoolService.models.*;
 import com.carpoolapp.carpoolService.models.enums.RideParticipateRole;
 import com.carpoolapp.carpoolService.models.enums.RideParticipantStatus;
-import com.carpoolapp.carpoolService.repository.FareRepository;
-import com.carpoolapp.carpoolService.repository.RideParticipantRepository;
-import com.carpoolapp.carpoolService.repository.RideRepository;
-import com.carpoolapp.carpoolService.repository.UserRepository;
-import com.carpoolapp.carpoolService.repository.VehicleRepository;
+import com.carpoolapp.carpoolService.repository.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +40,9 @@ public class MultiServiceIntegrationTests {
     @Autowired
     private RideParticipantRepository rideParticipantRepository;
 
+    @Autowired
+    private WalletRepository walletRepository;
+
     private Ride testRide;
     private User testUser;
 
@@ -63,6 +58,11 @@ public class MultiServiceIntegrationTests {
         testVehicle.setId(null); // Let the database generate the ID
         testVehicle.setOwner(testUser);
         vehicleRepository.save(testVehicle);
+
+        // Create and set the user's wallet
+        Wallet wallet = new Wallet();
+        wallet.setUserId(testUser.getId());
+        walletRepository.save(wallet);
 
         // Create and save a test ride with the vehicle
         testRide = new Ride();
