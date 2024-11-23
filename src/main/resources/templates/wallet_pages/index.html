@@ -43,16 +43,16 @@
 <div class="container mt-5">
   <h1 class="text-center">My Wallet</h1>
 
+  <div th:if="${message}" class="alert alert-success text-center">
+    <p th:text="${message}"></p>
+  </div>
+
+  <div th:if="${errorMessage}" class="alert alert-warning text-center">
+    <p th:text="${errorMessage}"></p>
+  </div>
+
   <!-- Wallet Exists -->
   <div th:if="${walletExists}">
-
-    <div th:if="${message}" class="alert alert-success text-center">
-      <p th:text="${message}"></p>
-    </div>
-
-    <div th:if="${errorMessage}" class="alert alert-warning text-center">
-      <p th:text="${errorMessage}"></p>
-    </div>
 
     <!-- Display Current Balance -->
     <div class="text-center mt-4">
@@ -75,7 +75,6 @@
 
   <!-- No Wallet Exists -->
   <div th:if="${!walletExists}" class="text-center">
-    <p class="text-danger" th:text="${message}">You haven't set up your wallet yet. Enter your details below to load money.</p>
 
     <!-- Create Wallet Form -->
     <form th:action="@{/wallet/create}" method="post" class="mt-5">

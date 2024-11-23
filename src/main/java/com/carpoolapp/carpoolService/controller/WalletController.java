@@ -31,7 +31,6 @@ public class WalletController {
 
         if (wallet == null) {
             model.addAttribute("walletExists", false);
-            model.addAttribute("message", "You haven't set up your wallet yet. Enter your details below to load money.");
         } else {
             model.addAttribute("walletExists", true);
             model.addAttribute("wallet", wallet);
