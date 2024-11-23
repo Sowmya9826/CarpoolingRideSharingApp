@@ -70,14 +70,41 @@ class Fare{
   +updateFare()
   +deleteFare()
 }
+class Wallet {
+   -id: Long
+   -userId: Long
+   -balance: double
+   -cardNumber: String
+   -cardHolderName: String
+   -expiryDate: LocalDate
+   -billingAddress: String
+}
+class RecurringToOneTimeRideLink {
+  -id: Long
+  -recurringRide: Ride
+  -oneTimeRide: Ride
+}
 
+class Transaction {
+  -id: Long
+  -amount: double
+  -user: User
+  -fare:Fare
+  -type: TransactionType
+  -status: TransactionStatus
+  -description: String
+  -completedAt: LocalDate
+ }
 
 User "1" -- "0.*" Vehicle : owns
 User "0.*" -- "0.*" Ride : participates in <
+User "1" -- "1" Wallet : has
+User "1" -- "0.*" Transaction : creates
 Ride "1" -- "1.*" RideParticipant : has
 Ride "1" -- "1" Fare : has
 Ride "1" -- "2" Location : has
-
+Ride "1" -- "0.*" RecurringToOneTimeRideLink : links
+Fare "1" -- "0.*" Transaction : has
 
 
 @enduml

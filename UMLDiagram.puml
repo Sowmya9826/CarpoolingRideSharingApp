@@ -13,6 +13,11 @@ class User {
   +createUser()
   +updateProfile()
 }
+class RecurringToOneTimeRideLink {
+  -id: Long
+  -recurringRide: Ride
+  -oneTimeRide: Ride
+}
 
 class Vehicle {
   -id: Long
@@ -54,6 +59,7 @@ class RideParticipant {
   +joinRide()
   +cancelRide()
 }
+
 class Location {
   -id: Long
   -latitude: double
@@ -61,6 +67,30 @@ class Location {
   -address: String
   +createLocation()
 }
+
+class Transaction {
+  -id: Long
+  -amount: double
+  -user: User
+  -fare:Fare
+  -type: TransactionType
+  -status: TransactionStatus
+  -description: String
+  -completedAt: LocalDate
+ }
+
+class Wallet {
+   -id: Long
+   -userId: Long
+   -balance: double
+   -cardNumber: String
+   -cardHolderName: String
+   -expiryDate: LocalDate
+   -billingAddress: String
+}
+
+
+
 class Fare{
   -id: Long
   -ride: Ride
@@ -77,9 +107,13 @@ enum RideStatus {
   COMPLETED
   CANCELLED
 }
-enum  FareStatus{
+enum  TransactionStatus{
     PENDING
     COMPLETED
+}
+enum  TransactionType{
+    DEBIT
+    CREDIT
 }
 enum  RideParticipantStatus{
     ACTIVE
@@ -97,14 +131,18 @@ enum RideType {
 
 User "1" -- "0.*" Vehicle : owns
 User "0.*" -- "0.*" Ride : participates in <
+User "1" -- "1" Wallet : has
+User "1" -- "0.*" Transaction : creates
 Ride "1" -- "1.*" RideParticipant : has
 Ride "1" -- "1" Fare : has
 Ride "1" -- "2" Location : has
+Ride "1" -- "0.*" RecurringToOneTimeRideLink : links
+Fare "1" -- "0.*" Transaction : has
 Ride -- RideStatus : has
 Ride -- RideType : has
 RideParticipant -- RideParticipantRole : has
 RideParticipant -- RideParticipantStatus : has
-Fare -- FareStatus : has
-
+Transaction -- TransactionStatus : has
+Transaction -- TransactionType : has
 
 @enduml
