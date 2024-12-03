@@ -70,25 +70,22 @@
 
         <!-- Start Location Inputs -->
         <div class="mb-3">
-            <label for="startLatitude" class="form-label">Latitude:</label>
-            <div class="input-group">
-                <input type="text" id="startAddress" name="startAddress" class="form-control rounded-start" placeholder="Click 'Set Start' and select on map" readonly>
-                <button type="button" id="setStart" class="btn btn-primary maps-loc-select rounded-end">Set Start</button>
-            </div>
+            <label for="startAddress" class="form-label">Start Address:</label>
+            <input type="text" id="startAddress" name="startAddress" class="form-control" placeholder="Enter Start Address" required>
+            <button type="button" id="setStart" class="btn btn-primary maps-loc-select" onclick="geocodeAddress(document.getElementById('startAddress').value, 'start')">Set Start</button>
             <input type="hidden" id="startLatitude" name="startLatitude">
             <input type="hidden" id="startLongitude" name="startLongitude">
         </div>
 
         <!-- Destination Location Inputs -->
         <div class="mb-3">
-            <label for="endLatitude" class="form-label">Destination Location</label>
-            <div class="input-group">
-                <input type="text" id="endAddress" name="endAddress" class="form-control rounded-start" placeholder="Click 'Set Destination' and select on map" readonly>
-                <button type="button" id="setDestination" class="btn btn-primary maps-loc-select rounded-end">Set Destination</button>
-            </div>
+            <label for="endAddress" class="form-label">Destination Address:</label>
+            <input type="text" id="endAddress" name="endAddress" class="form-control" placeholder="Enter Destination Address" required>
+            <button type="button" id="setDestination" class="btn btn-primary maps-loc-select" onclick="geocodeAddress(document.getElementById('endAddress').value, 'destination')">Set Destination</button>
             <input type="hidden" id="endLatitude" name="endLatitude">
             <input type="hidden" id="endLongitude" name="endLongitude">
         </div>
+
 
         <!-- Ride Type -->
         <div class="mb-3">
